@@ -25,6 +25,7 @@
 
     <dubbo:registry address="zookeeper://127.0.0.1:2181"/>
 
+    <!--check="false" 消费端启动时不检查引用服务是否准备好-->
     <dubbo:reference id="demoService" check="false" interface="org.apache.dubbo.demo.DemoService"/>
 
 </beans>
