@@ -18,20 +18,55 @@ package org.apache.dubbo.demo.consumer;
 
 import org.apache.dubbo.demo.DemoService;
 
+import org.apache.dubbo.demo.ValidationParameter;
+import org.apache.dubbo.demo.ValidationService;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import java.util.Date;
 import java.util.concurrent.CompletableFuture;
 
 public class Application {
+
+    static ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("spring/dubbo-consumer.xml");
+
     /**
      * In order to make sure multicast registry works, need to specify '-Djava.net.preferIPv4Stack=true' before
      * launch the application
      */
     public static void main(String[] args) throws Exception {
-        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("spring/dubbo-consumer.xml");
         context.start();
-//        DemoService demoService = context.getBean("demoService", DemoService.class);
+
+        //defalut();
+
+        checkParameters();
+
+       // System.in.read();
+    }
+
+    private static void defalut(){
+        DemoService demoService = context.getBean("demoService", DemoService.class);
+
+        String result = demoService.sayHello("hello");
+
 //        CompletableFuture<String> hello = demoService.sayHelloAsync("world");
 //        System.out.println("result: " + hello.get());
+        System.out.println("result="+result);
     }
+
+    private static void checkParameters(){
+        ValidationService validationService = context.getBean("validationService", ValidationService.class);
+
+        ValidationParameter parameter = new ValidationParameter();
+        parameter.setAge(30);
+        parameter.setName("ouwen");
+        parameter.setEmail("1028826686@qq.com");
+        Date start = new Date(System.currentTimeMillis() - 10 * 1_0000);
+        parameter.setLoginDate(start);
+        Date end = new Date(System.currentTimeMillis() + 10 * 1_0000);
+        parameter.setExpiryDate(end);
+
+        validationService.save(parameter);
+
+    }
+
 }

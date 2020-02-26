@@ -23,5 +23,6 @@ public class Application {
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("spring/dubbo-provider.xml");
         context.start();
         System.in.read();
+
     }
 }

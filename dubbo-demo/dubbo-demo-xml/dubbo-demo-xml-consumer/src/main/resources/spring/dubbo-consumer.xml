@@ -26,6 +26,13 @@
     <dubbo:registry address="zookeeper://127.0.0.1:2181"/>
 
     <!--check="false" 消费端启动时不检查引用服务是否准备好-->
-    <dubbo:reference id="demoService" check="false" interface="org.apache.dubbo.demo.DemoService"/>
+    <!--直连绕开注册中心
+    1.url="dubbo://localhost:20890"
+    2.通过 -D 参数指定 java -Dorg.apache.dubbo.demo.DemoService=dubbo://localhost:20891
+    3.通过文件映射 -Ddubbo.resolve.file , java -Ddubbo.resolve.file=xxx.properties
+    -->
+    <dubbo:reference id="demoService" check="false" interface="org.apache.dubbo.demo.DemoService" />
+
+    <dubbo:reference id="validationService" check="false" interface="org.apache.dubbo.demo.ValidationService" validation="false"/>
 
 </beans>

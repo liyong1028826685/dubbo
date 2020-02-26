@@ -22,6 +22,7 @@ import org.apache.dubbo.rpc.RpcContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 
 public class DemoServiceImpl implements DemoService {
@@ -30,11 +31,13 @@ public class DemoServiceImpl implements DemoService {
     @Override
     public String sayHello(String name) {
         logger.info("Hello " + name + ", request from consumer: " + RpcContext.getContext().getRemoteAddress());
-        try {
-            Thread.sleep(10000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            long time = new Random().nextInt(10);
+//            Thread.sleep(time * 1000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+        logger.info("Hello " + name + ", response from provider: " + RpcContext.getContext().getRemoteAddress());
         return "Hello " + name + ", response from provider: " + RpcContext.getContext().getLocalAddress();
     }
 
