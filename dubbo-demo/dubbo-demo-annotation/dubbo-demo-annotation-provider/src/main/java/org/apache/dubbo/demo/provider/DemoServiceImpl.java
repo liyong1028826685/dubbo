@@ -32,6 +32,11 @@ public class DemoServiceImpl implements DemoService {
     private static final Logger logger = LoggerFactory.getLogger(DemoServiceImpl.class);
 
     @Override
+    public String mock(String name) {
+        return name;
+    }
+
+    @Override
     public String sayHello(String name) {
         logger.info("Hello " + name + ", request from consumer: " + RpcContext.getContext().getRemoteAddress());
         return "Hello " + name + ", response from provider: " + RpcContext.getContext().getLocalAddress();
@@ -40,6 +45,11 @@ public class DemoServiceImpl implements DemoService {
     @Override
     public CompletableFuture<String> sayHelloAsync(String name) {
         return null;
+    }
+
+    @Override
+    public CompletableFuture<String> sayHello2(String str) {
+        return CompletableFuture.supplyAsync(()->str);
     }
 
 }

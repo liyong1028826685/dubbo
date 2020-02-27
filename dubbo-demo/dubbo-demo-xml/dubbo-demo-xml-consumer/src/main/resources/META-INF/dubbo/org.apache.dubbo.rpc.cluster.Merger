@@ -1,0 +1,2 @@
+demoMerger=org.apache.dubbo.demo.consumer.DemoMerge
+demoMerger2=org.apache.dubbo.demo.consumer.DemoMerge2

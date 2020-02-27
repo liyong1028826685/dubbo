@@ -18,32 +18,37 @@ package org.apache.dubbo.demo.provider;
 
 import org.apache.dubbo.demo.DemoService;
 import org.apache.dubbo.rpc.RpcContext;
-
+import org.apache.dubbo.rpc.RpcException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 
-public class DemoServiceImpl implements DemoService {
-    private static final Logger logger = LoggerFactory.getLogger(DemoServiceImpl.class);
+public class DemoServiceImpl2 implements DemoService {
+    private static final Logger logger = LoggerFactory.getLogger(DemoServiceImpl2.class);
 
     @Override
     public String mock(String name) {
+        try {
+            int i  =  1/0;
+        } catch (Exception e) {
+            //Note需要抛出RpcException才会走到消费端自定义的Mock中去
+            throw new RpcException(e);
+        }
         return name;
     }
 
     @Override
     public String sayHello(String name) {
-        logger.info("Hello " + name + ", request from consumer: " + RpcContext.getContext().getRemoteAddress());
+        logger.info("Hello 2" + name + ", request from consumer: " + RpcContext.getContext().getRemoteAddress());
 //        try {
 //            long time = new Random().nextInt(10);
 //            Thread.sleep(time * 1000);
 //        } catch (InterruptedException e) {
 //            e.printStackTrace();
 //        }
-        logger.info("Hello " + name + ", response from provider: " + RpcContext.getContext().getRemoteAddress());
-        return "Hello " + name + ", response from provider: " + RpcContext.getContext().getLocalAddress();
+        logger.info("Hello 2" + name + ", response from provider: " + RpcContext.getContext().getRemoteAddress());
+        return "Hello 2" + name + ", response from provider: " + RpcContext.getContext().getLocalAddress();
     }
 
     @Override

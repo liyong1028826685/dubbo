@@ -36,12 +36,15 @@
 <!--    </bean>-->
 
     <bean id="demoService" class="org.apache.dubbo.demo.provider.DemoServiceImpl"/>
+    <bean id="demoService2" class="org.apache.dubbo.demo.provider.DemoServiceImpl2"/>
     <bean id="validationService" class="org.apache.dubbo.demo.provider.ValidationServiceImpl"/>
+
 
     <!--这里使用 cluster="forking"并且获取配置需要注意超时时间如果在超时时间还未获取到结果返回null-->
 
-    <dubbo:service interface="org.apache.dubbo.demo.DemoService" ref="demoService" forks="2"  cluster="forking" timeout="10000"/>
+    <dubbo:service interface="org.apache.dubbo.demo.DemoService" ref="demoService" group="demo1"  stub="true"/>
+    <dubbo:service interface="org.apache.dubbo.demo.DemoService" ref="demoService2" group="demo2" stub="true"/>
     <!--开启jsr303参数校验-->
-    <dubbo:service interface="org.apache.dubbo.demo.ValidationService" ref="validationService" validation="custom"/>
+    <dubbo:service interface="org.apache.dubbo.demo.ValidationService" ref="validationService" validation="custom" />
 
 </beans>

@@ -32,6 +32,11 @@ public class DemoServiceComponent implements DemoService {
     private DemoService demoService;
 
     @Override
+    public String mock(String name) {
+        return name;
+    }
+
+    @Override
     public String sayHello(String name) {
         return demoService.sayHello(name);
     }
@@ -39,5 +44,10 @@ public class DemoServiceComponent implements DemoService {
     @Override
     public CompletableFuture<String> sayHelloAsync(String name) {
         return null;
+    }
+
+    @Override
+    public CompletableFuture<String> sayHello2(String str) {
+        return CompletableFuture.supplyAsync(()->str);
     }
 }

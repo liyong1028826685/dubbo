@@ -21,7 +21,7 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
        http://dubbo.apache.org/schema/dubbo http://dubbo.apache.org/schema/dubbo/dubbo.xsd">
 
-    <dubbo:application name="demo-consumer"/>
+    <dubbo:application name="demo-consumer" logger="log4j"/>
 
     <dubbo:registry address="zookeeper://127.0.0.1:2181"/>
 
@@ -31,7 +31,16 @@
     2.通过 -D 参数指定 java -Dorg.apache.dubbo.demo.DemoService=dubbo://localhost:20891
     3.通过文件映射 -Ddubbo.resolve.file , java -Ddubbo.resolve.file=xxx.properties
     -->
-    <dubbo:reference id="demoService" check="false" interface="org.apache.dubbo.demo.DemoService" />
+
+    <dubbo:reference id="demoService2" check="false" interface="org.apache.dubbo.demo.DemoService" group="demo2" mock="force">
+<!--        <dubbo:method name="sayHello"  cache="lru"/>-->
+        <dubbo:method name="sayHello"  async="true"/>
+    </dubbo:reference>
+
+    <dubbo:reference id="demoService" check="false" interface="org.apache.dubbo.demo.DemoService" group="demo1,demo2" merger="true" >
+<!-- 如果定义多个merger 不指定merger默认使用第一个加载的，  对方法特殊自定    <dubbo:method  name="sayHello" merger="demoMerger2"/>-->
+        <dubbo:method name="sayHello"  cache="lru"/>
+    </dubbo:reference>
 
     <dubbo:reference id="validationService" check="false" interface="org.apache.dubbo.demo.ValidationService" validation="false"/>
 

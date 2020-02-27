@@ -17,9 +17,9 @@
 package org.apache.dubbo.demo.consumer;
 
 import org.apache.dubbo.demo.DemoService;
-
 import org.apache.dubbo.demo.ValidationParameter;
 import org.apache.dubbo.demo.ValidationService;
+import org.apache.dubbo.rpc.RpcContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.util.Date;
@@ -36,11 +36,57 @@ public class Application {
     public static void main(String[] args) throws Exception {
         context.start();
 
-        //defalut();
+//        for(int i=0;i<10;i++){
+//            cache();
+//            TimeUnit.SECONDS.sleep(1);
+//        }
 
-        checkParameters();
+        //checkParameters();
 
-       // System.in.read();
+        mock();
+
+//        asyncCall();
+
+//        asyncRPCContext();
+
+//        async();
+
+        //System.in.read();
+    }
+
+
+    private static void mock(){
+        DemoService demoService = context.getBean("demoService2", DemoService.class);
+        String result = demoService.mock("mock");
+        System.out.println(result);
+    }
+
+    private static void asyncCall(){
+        DemoService demoService = context.getBean("demoService2", DemoService.class);
+        CompletableFuture future = RpcContext.getContext().asyncCall(() -> demoService.sayHello("Hello"));
+        future.whenComplete((d,t)-> System.out.println("async result is "+d));
+    }
+
+    private static void  asyncRPCContext(){
+        DemoService demoService = context.getBean("demoService2", DemoService.class);
+        demoService.sayHello("Hello");
+        CompletableFuture<String> fut = RpcContext.getContext().getCompletableFuture();
+
+        fut.whenComplete((d,t)-> System.out.println("async result is"+d));
+
+        //String s = fut.join();
+        //System.out.println("async result is "+s);
+    }
+
+
+    private static void  async(){
+        DemoService demoService = context.getBean("demoService2", DemoService.class);
+        CompletableFuture<String> fut = demoService.sayHello2("Hello");
+
+        fut.whenComplete((d,t)-> System.out.println("async result is"+d));
+
+        //String s = fut.join();
+        //System.out.println("async result is "+s);
     }
 
     private static void defalut(){
@@ -48,8 +94,17 @@ public class Application {
 
         String result = demoService.sayHello("hello");
 
-//        CompletableFuture<String> hello = demoService.sayHelloAsync("world");
-//        System.out.println("result: " + hello.get());
+        System.out.println("result="+result);
+    }
+
+    /**
+     * 客户端实现缓存
+     */
+    private static void cache(){
+        DemoService demoService = context.getBean("demoService2", DemoService.class);
+
+        String result = demoService.sayHello("hello");
+
         System.out.println("result="+result);
     }
 

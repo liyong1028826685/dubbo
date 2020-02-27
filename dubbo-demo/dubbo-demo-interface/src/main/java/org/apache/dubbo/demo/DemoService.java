@@ -20,10 +20,14 @@ import java.util.concurrent.CompletableFuture;
 
 public interface DemoService {
 
+
+    String mock(String name);
+
     String sayHello(String name);
 
     default CompletableFuture<String> sayHelloAsync(String name) {
         return CompletableFuture.completedFuture(sayHello(name));
     }
 
+    CompletableFuture<String> sayHello2(String str);
 }
