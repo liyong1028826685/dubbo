@@ -170,7 +170,8 @@ public interface CommonConstants {
 
     String METADATA_REVISION = "metadata.revision";
 
-    String METADATA_KEY = "metadata";
+    //Fixme url参数名称为：metadata.type
+    String METADATA_KEY = "metadata.type";
 
     String DEFAULT_METADATA_STORAGE_TYPE = "local";
 

@@ -166,6 +166,17 @@ public class ConfigValidationUtils {
     private static final Pattern PATTERN_KEY = Pattern.compile("[*,\\-._0-9a-zA-Z]+");
 
 
+    /***
+     *
+     * 获取注册信息
+     *
+     * @author liyong
+     * @date 16:42 2020-03-01
+     * @param interfaceConfig
+ * @param provider
+     * @exception
+     * @return java.util.List<org.apache.dubbo.common.URL>
+     **/
     public static List<URL> loadRegistries(AbstractInterfaceConfig interfaceConfig, boolean provider) {
         // check && override if necessary
         List<URL> registryList = new ArrayList<URL>();
@@ -194,6 +205,7 @@ public class ConfigValidationUtils {
                                 .addParameter(REGISTRY_KEY, url.getProtocol())
                                 .setProtocol(extractRegistryType(url))
                                 .build();
+                        //服务提供者、服务消费者需要向注册中心注册
                         if ((provider && url.getParameter(REGISTER_KEY, true))
                                 || (!provider && url.getParameter(SUBSCRIBE_KEY, true))) {
                             registryList.add(url);
@@ -356,6 +368,10 @@ public class ConfigValidationUtils {
         }
     }
 
+    /**
+     * Parameters参数检验
+     * @param config
+     */
     public static void validateConfigCenterConfig(ConfigCenterConfig config) {
         if (config != null) {
             checkParameterName(config.getParameters());
@@ -372,7 +388,7 @@ public class ConfigValidationUtils {
                     "Please add <dubbo:application name=\"...\" /> to your spring config.");
         }
 
-        // backward compatibility
+        // backward compatibility jvm关闭等待超时时间
         String wait = ConfigUtils.getProperty(SHUTDOWN_WAIT_KEY);
         if (wait != null && wait.trim().length() > 0) {
             System.setProperty(SHUTDOWN_WAIT_KEY, wait.trim());

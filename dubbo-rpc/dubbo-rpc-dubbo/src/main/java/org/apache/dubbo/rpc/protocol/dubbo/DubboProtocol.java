@@ -301,8 +301,9 @@ public class DubboProtocol extends AbstractProtocol {
                 stubServiceMethodsMap.put(url.getServiceKey(), stubServiceMethods);
             }
         }
-
+        //创建服务端口，等待连接
         openServer(url);
+        //序列化优化
         optimizeSerialization(url);
 
         return exporter;

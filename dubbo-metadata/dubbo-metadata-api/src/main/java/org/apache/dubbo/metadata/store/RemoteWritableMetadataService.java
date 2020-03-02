@@ -80,6 +80,7 @@ public class RemoteWritableMetadataService implements WritableMetadataService {
                     && !ProtocolUtils.isGeneric(providerUrl.getParameter(GENERIC_KEY))) {
                 Class interfaceClass = Class.forName(interfaceName);
                 ServiceDefinition serviceDefinition = ServiceDefinitionBuilder.build(interfaceClass);
+                //写入元数据到配置中心和本地磁盘缓存
                 getMetadataReport().storeProviderMetadata(new MetadataIdentifier(providerUrl.getServiceInterface(),
                         providerUrl.getParameter(VERSION_KEY), providerUrl.getParameter(GROUP_KEY),
                         null, null), serviceDefinition);

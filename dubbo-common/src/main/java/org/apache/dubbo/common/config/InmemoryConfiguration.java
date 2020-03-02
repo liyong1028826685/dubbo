@@ -20,6 +20,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
+ * 包括两个实现全局和应用级别的配置都是存放在内存
  * In-memory configuration
  */
 public class InmemoryConfiguration extends AbstractPrefixConfiguration {

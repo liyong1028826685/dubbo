@@ -456,22 +456,34 @@ public abstract class AbstractConfig implements Serializable {
         this.prefix = prefix;
     }
 
+    /***
+     *
+     * 配置不同Config的属性值从多个配置源
+     *
+     * @author liyong
+     * @date 21:38 2020-02-27
+     * @param
+     * @exception
+     * @return void
+     **/
     public void refresh() {
         Environment env = ApplicationModel.getEnvironment();
         try {
             CompositeConfiguration compositeConfiguration = env.getConfiguration(getPrefix(), getId());
             Configuration config = new ConfigConfigurationAdapter(this);
+            //配置中心优先
             if (env.isConfigCenterFirst()) {
-                // The sequence would be: SystemConfiguration -> AppExternalConfiguration -> ExternalConfiguration -> AbstractConfig -> PropertiesConfiguration
+                // The sequence would be: SystemConfiguration -> EnvironmentConfiguration  ->  AppExternalConfiguration -> ExternalConfiguration -> AbstractConfig -> PropertiesConfiguration
                 compositeConfiguration.addConfiguration(4, config);
             } else {
-                // The sequence would be: SystemConfiguration -> AbstractConfig -> AppExternalConfiguration -> ExternalConfiguration -> PropertiesConfiguration
+                // The sequence would be: SystemConfiguration -> EnvironmentConfiguration  -> AbstractConfig -> AppExternalConfiguration -> ExternalConfiguration -> PropertiesConfiguration
                 compositeConfiguration.addConfiguration(2, config);
             }
 
             // loop methods, get override value and set the new value back to method
             Method[] methods = getClass().getMethods();
             for (Method method : methods) {
+                //使用setter设置属性值
                 if (MethodUtils.isSetter(method)) {
                     try {
                         String value = StringUtils.trim(compositeConfiguration.getString(extractPropertyName(getClass(), method)));
@@ -484,6 +496,7 @@ public abstract class AbstractConfig implements Serializable {
                                 this.getClass().getSimpleName() +
                                 ", please make sure every property has getter/setter method provided.");
                     }
+                    //使用setParameters设置参数
                 } else if (isParametersSetter(method)) {
                     String value = StringUtils.trim(compositeConfiguration.getString(extractPropertyName(getClass(), method)));
                     if (StringUtils.isNotEmpty(value)) {

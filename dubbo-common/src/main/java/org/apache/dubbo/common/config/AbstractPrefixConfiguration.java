@@ -38,13 +38,13 @@ public abstract class AbstractPrefixConfiguration implements Configuration {
     public Object getProperty(String key, Object defaultValue) {
         Object value = null;
         if (StringUtils.isNotEmpty(prefix)) {
-            if (StringUtils.isNotEmpty(id)) {
+            if (StringUtils.isNotEmpty(id)) {//dubbo.application. + demo-provider +  '.' + ${key}
                 value = getInternalProperty(prefix + id + "." + key);
             }
-            if (value == null) {
+            if (value == null) {//dubbo.application.  +   ${key}
                 value = getInternalProperty(prefix + key);
             }
-        } else {
+        } else {//${key}
             value = getInternalProperty(key);
         }
         return value != null ? value : defaultValue;

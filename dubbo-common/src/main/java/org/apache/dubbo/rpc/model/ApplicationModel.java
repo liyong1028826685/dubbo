@@ -76,7 +76,18 @@ public class ApplicationModel {
     }
 
     private static final ExtensionLoader<FrameworkExt> loader = ExtensionLoader.getExtensionLoader(FrameworkExt.class);
-
+    /***
+     * 初始化以下组件
+     * 0 = {ConfigManager@2370}
+     * 1 = {Environment@2372}
+     * 2 = {ServiceRepository@2426}
+     *
+     * @author liyong
+     * @date 14:37 2020-02-29
+     * @param
+     * @exception
+     * @return void
+     **/
     public static void iniFrameworkExts() {
         Set<FrameworkExt> exts = ExtensionLoader.getExtensionLoader(FrameworkExt.class).getSupportedExtensionInstances();
         for (FrameworkExt ext : exts) {

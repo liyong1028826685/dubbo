@@ -45,7 +45,7 @@ public class Application {
 
         mock();
 
-//        asyncCall();
+        asyncCall();
 
 //        asyncRPCContext();
 

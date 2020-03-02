@@ -25,6 +25,7 @@ import java.util.Properties;
 import java.util.Set;
 
 /**
+ * 从 system properties and dubbo.properties
  * Configuration from system properties and dubbo.properties
  */
 public class PropertiesConfiguration extends AbstractPrefixConfiguration {

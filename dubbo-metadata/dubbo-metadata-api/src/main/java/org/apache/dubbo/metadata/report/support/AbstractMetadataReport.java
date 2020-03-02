@@ -140,7 +140,16 @@ public abstract class AbstractMetadataReport implements MetadataReport {
         }
         this.reportURL = url;
     }
-
+    /***
+     *
+     * 本地保存
+     *
+     * @author liyong
+     * @date 20:21 2020-03-01
+     * @param version
+     * @exception
+     * @return void
+     **/
     private void doSaveProperties(long version) {
         if (version < lastCacheChanged.get()) {
             return;

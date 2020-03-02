@@ -184,9 +184,9 @@ public class RegistryProtocol implements Protocol {
 
     @Override
     public <T> Exporter<T> export(final Invoker<T> originInvoker) throws RpcException {
-        URL registryUrl = getRegistryUrl(originInvoker);
+        URL registryUrl = getRegistryUrl(originInvoker);//zookeeper://127.0.0.1:2181/org.apache.dubbo.registry.RegistryService?application=demo-provider&dubbo=2.0.2&export=dubbo%3A%2F%2F192.168.3.31%3A20880%2Forg.apache.dubbo.demo.ValidationService%3Fanyhost%3Dtrue%26application%3Ddemo-provider%26bind.ip%3D192.168.3.31%26bind.port%3D20880%26default%3Dtrue%26deprecated%3Dfalse%26dubbo%3D2.0.2%26dynamic%3Dtrue%26generic%3Dfalse%26interface%3Dorg.apache.dubbo.demo.ValidationService%26metadata.type%3Dremote%26methods%3Dsave%2Cupdate%26pid%3D1329%26qos.port%3D22222%26release%3D%26side%3Dprovider%26timestamp%3D1583053047758%26validation%3Dcustom&metadata.type=remote&pid=1329&qos.port=22222&timestamp=1583053047750
         // url to export locally
-        URL providerUrl = getProviderUrl(originInvoker);
+        URL providerUrl = getProviderUrl(originInvoker);//dubbo://192.168.3.31:20880/org.apache.dubbo.demo.ValidationService?anyhost=true&application=demo-provider&bind.ip=192.168.3.31&bind.port=20880&default=true&deprecated=false&dubbo=2.0.2&dynamic=true&generic=false&interface=org.apache.dubbo.demo.ValidationService&metadata.type=remote&methods=save,update&pid=1329&qos.port=22222&release=&side=provider&timestamp=1583053047758&validation=custom
 
         // Subscribe the override data
         // FIXME When the provider subscribes, it will affect the scene : a certain JVM exposes the service and call
@@ -225,13 +225,25 @@ public class RegistryProtocol implements Protocol {
         return serviceConfigurationListener.overrideUrl(providerUrl);
     }
 
+    /***
+     *
+     * dubbo服务本地暴露
+     *
+     * @author liyong
+     * @date 14:37 2020-03-02
+     * @param originInvoker
+ * @param providerUrl
+     * @exception
+     * @return org.apache.dubbo.registry.integration.RegistryProtocol.ExporterChangeableWrapper<T>
+     **/
     @SuppressWarnings("unchecked")
     private <T> ExporterChangeableWrapper<T> doLocalExport(final Invoker<T> originInvoker, URL providerUrl) {
         String key = getCacheKey(originInvoker);
 
         return (ExporterChangeableWrapper<T>) bounds.computeIfAbsent(key, s -> {
+            //invoker包装路径InvokerDelegate->DelegateProviderMetaDataInvoker->AbstractProxyInvoker->Wrapper->ref
             Invoker<?> invokerDelegate = new InvokerDelegate<>(originInvoker, providerUrl);
-            return new ExporterChangeableWrapper<>((Exporter<T>) protocol.export(invokerDelegate), originInvoker);
+            return new ExporterChangeableWrapper<>((Exporter<T>) protocol.export(invokerDelegate), originInvoker);//ProtocolListenerWrapper->ProtocolFilterWrapper->DubboProtocol
         });
     }
 

@@ -23,7 +23,9 @@
 
     <dubbo:application name="demo-consumer" logger="log4j"/>
 
-    <dubbo:registry address="zookeeper://127.0.0.1:2181"/>
+    <dubbo:config-center address="zookeeper://127.0.0.1:2181" />
+
+<!--    <dubbo:registry address="zookeeper://127.0.0.1:2181"/>-->
 
     <!--check="false" 消费端启动时不检查引用服务是否准备好-->
     <!--直连绕开注册中心

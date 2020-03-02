@@ -21,13 +21,14 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
        http://dubbo.apache.org/schema/dubbo http://dubbo.apache.org/schema/dubbo/dubbo.xsd">
 
-    <dubbo:application name="demo-provider" />
-
+    <dubbo:application name="demo-provider"  metadata-type="remote"/>
+    <dubbo:metadata-report address="zookeeper://127.0.0.1:2181"/>
+    <dubbo:config-center address="zookeeper://127.0.0.1:2181"/>
     <!--
     register="false"  禁止注册到注册中心
     subscribe="false" 禁止订阅注册中心
     -->
-    <dubbo:registry address="zookeeper://127.0.0.1:2181" />
+<!--    <dubbo:registry address="zookeeper://127.0.0.1:2181" />-->
 
     <!-- 缺省值设置，当<dubbo:service>没有配置validation属性时，使用此配置 -->
     <dubbo:provider validation="custom" />
@@ -45,6 +46,7 @@
     <dubbo:service interface="org.apache.dubbo.demo.DemoService" ref="demoService" group="demo1"  stub="true"/>
     <dubbo:service interface="org.apache.dubbo.demo.DemoService" ref="demoService2" group="demo2" stub="true"/>
     <!--开启jsr303参数校验-->
-    <dubbo:service interface="org.apache.dubbo.demo.ValidationService" ref="validationService" validation="custom" />
+    <dubbo:service interface="org.apache.dubbo.demo.ValidationService" ref="validationService" validation="custom" >
+    </dubbo:service>
 
 </beans>

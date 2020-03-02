@@ -448,7 +448,18 @@ public class ApplicationConfig extends AbstractConfig {
         super.refresh();
         appendEnvironmentProperties();
     }
-
+    /***
+     *
+     * 从Environment获取配置
+     * 1.dubbo.labels
+     * 2.dubbo.env.keys
+     *
+     * @author liyong
+     * @date 22:00 2020-02-28
+     * @param
+     * @exception
+     * @return void
+     **/
     private void appendEnvironmentProperties() {
         if (parameters == null) {
             parameters = new HashMap<>();

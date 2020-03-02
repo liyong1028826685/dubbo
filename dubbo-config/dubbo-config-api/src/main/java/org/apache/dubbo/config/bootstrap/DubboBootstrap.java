@@ -140,7 +140,7 @@ public class DubboBootstrap extends GenericEventListener {
     private final EventDispatcher eventDispatcher = EventDispatcher.getDefaultExtension();
 
     private final ExecutorRepository executorRepository = ExtensionLoader.getExtensionLoader(ExecutorRepository.class).getDefaultExtension();
-
+    /*** 本地配置信息 */
     private final ConfigManager configManager;
 
     private final Environment environment;
@@ -182,7 +182,7 @@ public class DubboBootstrap extends GenericEventListener {
     private DubboBootstrap() {
         configManager = ApplicationModel.getConfigManager();
         environment = ApplicationModel.getEnvironment();
-
+        //注册DubboShutdownHook
         DubboShutdownHook.getDubboShutdownHook().register();
         ShutdownHookCallbacks.INSTANCE.addCallback(new ShutdownHookCallback() {
             @Override
@@ -200,7 +200,7 @@ public class DubboBootstrap extends GenericEventListener {
         Boolean registerConsumer = getApplication().getRegisterConsumer();
         return registerConsumer == null || !registerConsumer;
     }
-
+    //元数据类型：local、remote
     private String getMetadataType() {
         String type = getApplication().getMetadataType();
         if (StringUtils.isEmpty(type)) {
@@ -500,23 +500,24 @@ public class DubboBootstrap extends GenericEventListener {
         if (!initialized.compareAndSet(false, true)) {
             return;
         }
-
+        //获取FrameworkExt拓展类执行初始化：比如初始化配置中心数据
         ApplicationModel.iniFrameworkExts();
 
+        //获取配置中心数据
         startConfigCenter();
-
+        //兼容2.7.x之前版本 当没有明确指定配置中心并且使用zookeeper作为注册协议则模式注册中心和配置中心使用同一个
         useRegistryAsConfigCenterIfNecessary();
-
+        //MetadataReport连接初始化
         startMetadataReport();
-
+        //加载 多注册中心、多协议注册信息
         loadRemoteConfigs();
-
+        //所有配置参数校验
         checkGlobalConfigs();
 
         initMetadataService();
-
+        //元数据服务暴露
         initMetadataServiceExporter();
-
+        //注册事件监听
         initEventListener();
 
         if (logger.isInfoEnabled()) {
@@ -548,7 +549,16 @@ public class DubboBootstrap extends GenericEventListener {
         // check Ssl
         ConfigValidationUtils.validateSslConfig(getSsl());
     }
-
+    /***
+     *
+     * 获取配置中心信息
+     *
+     * @author liyong
+     * @date 22:13 2020-02-28
+     * @param
+     * @exception
+     * @return void
+     **/
     private void startConfigCenter() {
         Collection<ConfigCenterConfig> configCenters = configManager.getConfigCenters();
 
@@ -556,6 +566,7 @@ public class DubboBootstrap extends GenericEventListener {
             CompositeDynamicConfiguration compositeDynamicConfiguration = new CompositeDynamicConfiguration();
             for (ConfigCenterConfig configCenter : configCenters) {
                 configCenter.refresh();
+                //Parameters参数校验
                 ConfigValidationUtils.validateConfigCenterConfig(configCenter);
                 compositeDynamicConfiguration.addConfiguration(prepareEnvironment(configCenter));
             }
@@ -564,6 +575,16 @@ public class DubboBootstrap extends GenericEventListener {
         configManager.refreshAll();
     }
 
+    /***
+     *
+     * MetadataReport连接初始化
+     *
+     * @author liyong
+     * @date 16:47 2020-02-29
+     * @param
+     * @exception
+     * @return void
+     **/
     private void startMetadataReport() {
         ApplicationConfig applicationConfig = getApplication();
 
@@ -588,6 +609,8 @@ public class DubboBootstrap extends GenericEventListener {
     /**
      * For compatibility purpose, use registry as the default config center when the registry protocol is zookeeper and
      * there's no config center specified explicitly.
+     *
+     * 兼容2.7.x之前版本 当没有明确指定配置中心并且使用zookeeper作为注册协议则默认注册中心和配置中心使用同一个
      */
     private void useRegistryAsConfigCenterIfNecessary() {
         // we use the loading status of DynamicConfiguration to decide whether ConfigCenter has been initiated.
@@ -600,7 +623,9 @@ public class DubboBootstrap extends GenericEventListener {
         }
 
         configManager.getDefaultRegistries().stream()
+                //RegistryConfig没有配置UseAsConfigCenter或者为true
                 .filter(registryConfig -> registryConfig.getUseAsConfigCenter() == null || registryConfig.getUseAsConfigCenter())
+                //把注册中心的配置数据映射到配置中心
                 .forEach(registryConfig -> {
                     String protocol = registryConfig.getProtocol();
                     String id = "config-center-" + protocol + "-" + registryConfig.getPort();
@@ -624,8 +649,18 @@ public class DubboBootstrap extends GenericEventListener {
         startConfigCenter();
     }
 
+    /***
+     *
+     * 获取多注册中心配置并初始化
+     * 获取多协议配置并初始化
+     * @author ·
+     * @date 20:38 2020-02-29
+     * @param
+     * @exception
+     * @return void
+     **/
     private void loadRemoteConfigs() {
-        // registry ids to registry configs
+        // registry ids to registry configs  多注册中心：获取多注册中心配置 参考：https://segmentfault.com/a/1190000019710242?utm_source=tag-newest
         List<RegistryConfig> tmpRegistries = new ArrayList<>();
         Set<String> registryIds = configManager.getRegistryIds();
         registryIds.forEach(id -> {
@@ -667,6 +702,7 @@ public class DubboBootstrap extends GenericEventListener {
     }
 
     /**
+     * metadataService服务暴露
      * Initialize {@link MetadataServiceExporter}
      */
     private void initMetadataServiceExporter() {
@@ -812,12 +848,16 @@ public class DubboBootstrap extends GenericEventListener {
             if (!configCenter.checkOrUpdateInited()) {
                 return null;
             }
+            //获取具体的配置中心实现
             DynamicConfiguration dynamicConfiguration = getDynamicConfiguration(configCenter.toUrl());
+            //从配置中心获取全局配置
             String configContent = dynamicConfiguration.getProperties(configCenter.getConfigFile(), configCenter.getGroup());
 
-            String appGroup = getApplication().getName();
+            //Fixme dubbo存在获取不到应用级别配置文件
+            String appGroup = "dubbo/"+ getApplication().getName();
             String appConfigContent = null;
             if (isNotEmpty(appGroup)) {
+                //首先获取应用级配置 ，应用级没有配置 数据则获取全局配置
                 appConfigContent = dynamicConfiguration.getProperties
                         (isNotEmpty(configCenter.getAppConfigFile()) ? configCenter.getAppConfigFile() : configCenter.getConfigFile(),
                                 appGroup
@@ -825,7 +865,9 @@ public class DubboBootstrap extends GenericEventListener {
             }
             try {
                 environment.setConfigCenterFirst(configCenter.isHighestPriority());
+                //填充全局配置
                 environment.updateExternalConfigurationMap(parseProperties(configContent));
+                //填充应用配置
                 environment.updateAppExternalConfigurationMap(parseProperties(appConfigContent));
             } catch (IOException e) {
                 throw new IllegalStateException("Failed to parse configurations from Config Center.", e);
@@ -857,6 +899,16 @@ public class DubboBootstrap extends GenericEventListener {
         metadataServiceExporter.unexport();
     }
 
+    /***
+     *
+     * dubbo服务导出
+     *
+     * @author liyong
+     * @date 16:23 2020-03-01
+     * @param
+     * @exception
+     * @return void
+     **/
     private void exportServices() {
         configManager.getServices().forEach(sc -> {
             // TODO, compatible with ServiceConfig.export()
@@ -864,12 +916,14 @@ public class DubboBootstrap extends GenericEventListener {
             serviceConfig.setBootstrap(this);
 
             if (exportAsync) {
+                //异步导出
                 ExecutorService executor = executorRepository.getServiceExporterExecutor();
                 Future<?> future = executor.submit(() -> {
                     sc.export();
                 });
                 asyncExportingFutures.add(future);
             } else {
+                //同步导出
                 sc.export();
                 exportedServices.add(sc);
             }
@@ -989,6 +1043,16 @@ public class DubboBootstrap extends GenericEventListener {
         return this.serviceInstance;
     }
 
+    /***
+     *
+     * 当接受到DubboShutdownHook事件被回掉，做资源清理工作
+     *
+     * @author liyong
+     * @date 21:18 2020-02-29
+     * @param
+     * @exception
+     * @return void
+     **/
     public void destroy() {
         if (started.compareAndSet(true, false)
                 && destroyed.compareAndSet(false, true)) {

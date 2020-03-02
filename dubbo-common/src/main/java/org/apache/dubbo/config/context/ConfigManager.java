@@ -61,6 +61,20 @@ import static org.apache.dubbo.config.AbstractConfig.getTagName;
 import static org.apache.dubbo.config.Constants.PROTOCOLS_SUFFIX;
 import static org.apache.dubbo.config.Constants.REGISTRIES_SUFFIX;
 
+/***
+ *@className ConfigManager
+ *
+ *@description 所有的配置类管理包括缓存 *Config ：ApplicationConfig、MonitorConfig、ConsumerConfig
+ *
+ *@author <a href="http://youngitman.tech">青年IT男</a>
+ *
+ *@date 14:34 2020-02-29
+ *
+ *@JunitTest: {@link  }
+ *
+ *@version v1.0.0
+ *
+**/
 public class ConfigManager extends LifecycleAdapter implements FrameworkExt {
 
     private static final Logger logger = LoggerFactory.getLogger(ConfigManager.class);
@@ -281,6 +295,25 @@ public class ConfigManager extends LifecycleAdapter implements FrameworkExt {
         return getConfigs(getTagName(RegistryConfig.class));
     }
 
+    /***
+     *
+     * 获取多注册中心配置
+     *
+     * # 注册中心1 命名为wallet
+     * # 默认注册中心
+     * dubbo.registries.wallet.default=true
+     * dubbo.registries.wallet.protocol=zookeeper
+     * dubbo.registries.wallet.client=zkclient
+     * # 注册中心2 命名为pay
+     * dubbo.registries.pay.protocol=zookeeper
+     * dubbo.registries.pay.client=zkclient
+     *
+     * @author liyong
+     * @date 20:34 2020-02-29
+     * @param
+     * @exception
+     * @return java.util.Set<java.lang.String>
+     **/
     public Set<String> getRegistryIds() {
         Set<String> registryIds = new HashSet<>();
         registryIds.addAll(getSubProperties(ApplicationModel.getEnvironment().getExternalConfigurationMap(),
@@ -334,6 +367,16 @@ public class ConfigManager extends LifecycleAdapter implements FrameworkExt {
         }).collect(Collectors.toSet());
     }
 
+    /***
+     *
+     * 异步刷新所有配置
+     *
+     * @author liyong 
+     * @date 22:11 2020-02-28
+     * @param  
+     * @exception 
+     * @return void 
+     **/
     public void refreshAll() {
         write(() -> {
             // refresh all configs here,

@@ -25,6 +25,9 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.Ordered;
 
 /**
+ *
+ * Dubbo与spring整合接入点：包括启动、停止
+ *
  * The {@link ApplicationListener} for {@link DubboBootstrap}'s lifecycle when the {@link ContextRefreshedEvent}
  * and {@link ContextClosedEvent} raised
  *
@@ -47,11 +50,30 @@ public class DubboBootstrapApplicationListener extends OneTimeExecutionApplicati
             onContextClosedEvent((ContextClosedEvent) event);
         }
     }
-
+    /***
+     *
+     * 监听spring容器ContextRefreshedEvent事件，开启dubbo服务注册
+     *
+     * @author liyong
+     * @date 15:25 2020-03-01
+     * @param event
+     * @exception
+     * @return void
+     **/
     private void onContextRefreshedEvent(ContextRefreshedEvent event) {
         dubboBootstrap.start();
     }
 
+    /***
+     *
+     * spring容器ContextClosedEvent事件，停止dubb服务
+     *
+     * @author liyong
+     * @date 15:25 2020-03-01
+     * @param event
+     * @exception
+     * @return void
+     **/
     private void onContextClosedEvent(ContextClosedEvent event) {
         dubboBootstrap.stop();
     }

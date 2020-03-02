@@ -200,6 +200,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
         serviceMetadata.setTarget(getRef());
 
         if (shouldDelay()) {
+            //延迟暴露
             DELAY_EXPORT_EXECUTOR.schedule(this::doExport, getDelay(), TimeUnit.MILLISECONDS);
         } else {
             doExport();
@@ -294,6 +295,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
     private void doExportUrls() {
         ServiceRepository repository = ApplicationModel.getServiceRepository();
         ServiceDescriptor serviceDescriptor = repository.registerService(getInterfaceClass());
+        //服务端本地注册provider
         repository.registerProvider(
                 getUniqueServiceName(),
                 ref,
@@ -304,6 +306,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
 
         List<URL> registryURLs = ConfigValidationUtils.loadRegistries(this, true);
 
+        //多协议注册
         for (ProtocolConfig protocolConfig : protocols) {
             String pathKey = URL.buildKey(getContextPath(protocolConfig)
                     .map(p -> p + "/" + path)
@@ -422,9 +425,10 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
         Integer port = findConfigedPorts(protocolConfig, name, map);
         URL url = new URL(name, host, port, getContextPath(protocolConfig).map(p -> p + "/" + path).orElse(path), map);
 
-        // You can customize Configurator to append extra parameters
+        // You can customize Configurator to append extra parameters 对不同协议进行Configurator拓展
         if (ExtensionLoader.getExtensionLoader(ConfiguratorFactory.class)
                 .hasExtension(url.getProtocol())) {
+            //ConfiguratorFactory configuratorFactory = (ConfiguratorFactory)ExtensionLoader.getExtensionLoader(ConfiguratorFactory.class).getExtension(string);
             url = ExtensionLoader.getExtensionLoader(ConfiguratorFactory.class)
                     .getExtension(url.getProtocol()).getConfigurator(url).configure(url);
         }
@@ -463,10 +467,15 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
                         if (StringUtils.isNotEmpty(proxy)) {
                             registryURL = registryURL.addParameter(PROXY_KEY, proxy);
                         }
-
+                        //StubProxyFactoryWrapper->JavassistProxyFactory
+                        //返回AbstractProxyInvoker匿名内部类实例
                         Invoker<?> invoker = PROXY_FACTORY.getInvoker(ref, (Class) interfaceClass, registryURL.addParameterAndEncoded(EXPORT_KEY, url.toFullString()));
+
+                        //invoker包装路径DelegateProviderMetaDataInvoker->AbstractProxyInvoker->Wrapper->ref
                         DelegateProviderMetaDataInvoker wrapperInvoker = new DelegateProviderMetaDataInvoker(invoker, this);
 
+                        //Protocol==registry -> ProtocolListenerWrapper->ProtocolFilterWrapper->RegistryProtocol
+                        //Protocol==dubbo -> ProtocolListenerWrapper->ProtocolFilterWrapper->DubboProtocol
                         Exporter<?> exporter = protocol.export(wrapperInvoker);
                         exporters.add(exporter);
                     }
@@ -474,6 +483,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
                     if (logger.isInfoEnabled()) {
                         logger.info("Export dubbo service " + interfaceClass.getName() + " to url " + url);
                     }
+//                    不存在注册中心，仅导出服务
                     Invoker<?> invoker = PROXY_FACTORY.getInvoker(ref, (Class) interfaceClass, url);
                     DelegateProviderMetaDataInvoker wrapperInvoker = new DelegateProviderMetaDataInvoker(invoker, this);
 
@@ -486,6 +496,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
                  */
                 WritableMetadataService metadataService = WritableMetadataService.getExtension(url.getParameter(METADATA_KEY, DEFAULT_METADATA_STORAGE_TYPE));
                 if (metadataService != null) {
+                    //发布元数据到配置中心和本地缓存
                     metadataService.publishServiceDefinition(url);
                 }
             }

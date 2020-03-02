@@ -58,7 +58,21 @@ public class CompositeConfiguration implements Configuration {
     public void addConfiguration(int pos, Configuration configuration) {
         this.configList.add(pos, configuration);
     }
-
+    /***
+     *
+     * 0 = {SystemConfiguration@2432}
+     * 1 = {EnvironmentConfiguration@2851}
+     * 2 = {InmemoryConfiguration@2852}
+     * 3 = {InmemoryConfiguration@2853}
+     * 4 = {ConfigConfigurationAdapter@2429}
+     * 5 = {PropertiesConfiguration@2854}
+     *
+     * @author liyong
+     * @date 21:29 2020-02-27
+     * @param key
+     * @exception
+     * @return java.lang.Object
+     **/
     @Override
     public Object getInternalProperty(String key) {
         Configuration firstMatchingConfiguration = null;

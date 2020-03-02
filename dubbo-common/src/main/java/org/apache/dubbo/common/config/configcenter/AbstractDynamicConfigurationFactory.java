@@ -24,6 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import static org.apache.dubbo.common.constants.CommonConstants.DEFAULT_KEY;
 
 /**
+ * 动态配置DynamicConfigurationFactory工厂类抽象
  * Abstract {@link DynamicConfigurationFactory} implementation with cache ability
  *
  * @see DynamicConfigurationFactory

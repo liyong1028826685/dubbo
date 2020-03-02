@@ -584,6 +584,16 @@ public class ExtensionLoader<T> {
         return new IllegalStateException(buf.toString());
     }
 
+    /***
+     *
+     * 创建指定名称的扩展类实例并注入依赖
+     *
+     * @author liyong
+     * @date 20:20 2020-02-27
+     * @param name
+     * @exception
+     * @return T
+     **/
     @SuppressWarnings("unchecked")
     private T createExtension(String name) {
         Class<?> clazz = getExtensionClasses().get(name);
@@ -596,13 +606,16 @@ public class ExtensionLoader<T> {
                 EXTENSION_INSTANCES.putIfAbsent(clazz, clazz.newInstance());
                 instance = (T) EXTENSION_INSTANCES.get(clazz);
             }
+            //实例bean属性注入
             injectExtension(instance);
             Set<Class<?>> wrapperClasses = cachedWrapperClasses;
             if (CollectionUtils.isNotEmpty(wrapperClasses)) {
+                // //注意：包装对象传递注入,层层包装。 例如：ProtocolFilterWrapper->ProtocolListenerWrapper->DubboProtocol
                 for (Class<?> wrapperClass : wrapperClasses) {
                     instance = injectExtension((T) wrapperClass.getConstructor(type).newInstance(instance));
                 }
             }
+            //实现Lifecycle接口，执行初始化
             initExtension(instance);
             return instance;
         } catch (Throwable t) {
@@ -615,6 +628,16 @@ public class ExtensionLoader<T> {
         return getExtensionClasses().containsKey(name);
     }
 
+    /***
+     *
+     * instance进行属性赋值，从容器中获取bean
+     *
+     * @author liyong
+     * @date 20:26 2020-02-27
+     * @param instance
+     * @exception
+     * @return T
+     **/
     private T injectExtension(T instance) {
 
         if (objectFactory == null) {
@@ -639,8 +662,10 @@ public class ExtensionLoader<T> {
 
                 try {
                     String property = getSetterProperty(method);
+                    //从对象  工厂获取实例bean
                     Object object = objectFactory.getExtension(pt, property);
                     if (object != null) {
+                        //给属性赋值
                         method.invoke(instance, object);
                     }
                 } catch (Exception e) {
@@ -695,7 +720,16 @@ public class ExtensionLoader<T> {
         }
         return getExtensionClasses().get(name);
     }
-
+    /***
+     *
+     * 获取所有的拓展Class
+     *
+     * @author liyong
+     * @date 20:18 2020-02-27
+     * @param
+     * @exception
+     * @return java.util.Map<java.lang.String,java.lang.Class<?>>
+     **/
     private Map<String, Class<?>> getExtensionClasses() {
         Map<String, Class<?>> classes = cachedClasses.get();
         if (classes == null) {
@@ -711,6 +745,13 @@ public class ExtensionLoader<T> {
     }
 
     /**
+     *
+     * CLASS_PATH=org.apache.dubbo.common.extension.ExtensionFactory
+     *
+     * 1.META-INF/dubbo/internal/${CLASS_PATH} Dubbo内部使用路径
+     * 2.META-INF/dubbo/${CLASS_PATH}  用户自定义扩展路径
+     * 3.META-INF/services/{CLASS_PATH} JdkSPI路径
+     *
      * synchronized in getExtensionClasses
      * */
     private Map<String, Class<?>> loadExtensionClasses() {
@@ -719,6 +760,7 @@ public class ExtensionLoader<T> {
         Map<String, Class<?>> extensionClasses = new HashMap<>();
         // internal extension load from ExtensionLoader's ClassLoader first
         loadDirectory(extensionClasses, DUBBO_INTERNAL_DIRECTORY, type.getName(), true);
+        //兼容处理 由于dubbo捐献给apache
         loadDirectory(extensionClasses, DUBBO_INTERNAL_DIRECTORY, type.getName().replace("org.apache", "com.alibaba"), true);
 
         loadDirectory(extensionClasses, DUBBO_DIRECTORY, type.getName());
@@ -729,6 +771,7 @@ public class ExtensionLoader<T> {
     }
 
     /**
+     * 获取指定类型上的@SPI注解value
      * extract and cache default extension name if exists
      */
     private void cacheDefaultExtensionName() {
@@ -763,13 +806,14 @@ public class ExtensionLoader<T> {
             // try to load from ExtensionLoader's ClassLoader first
             if (extensionLoaderClassLoaderFirst) {
                 ClassLoader extensionLoaderClassLoader = ExtensionLoader.class.getClassLoader();
+                //这里首先使用ExtensionLoader的类加载器，有可能是用户自定义加载
                 if (ClassLoader.getSystemClassLoader() != extensionLoaderClassLoader) {
                     urls = extensionLoaderClassLoader.getResources(fileName);
                 }
             }
             
             if(urls == null || !urls.hasMoreElements()) {
-                if (classLoader != null) {
+                if (classLoader != null) {//使用AppClassLoader加载
                     urls = classLoader.getResources(fileName);
                 } else {
                     urls = ClassLoader.getSystemResources(fileName);
@@ -787,13 +831,13 @@ public class ExtensionLoader<T> {
                     type + ", description file: " + fileName + ").", t);
         }
     }
-
+    //加载文件值转换为Class到Map
     private void loadResource(Map<String, Class<?>> extensionClasses, ClassLoader classLoader, java.net.URL resourceURL) {
         try {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(resourceURL.openStream(), StandardCharsets.UTF_8))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    final int ci = line.indexOf('#');
+                    final int ci = line.indexOf('#');//去掉注释
                     if (ci >= 0) {
                         line = line.substring(0, ci);
                     }
@@ -828,11 +872,14 @@ public class ExtensionLoader<T> {
                     type + ", class line: " + clazz.getName() + "), class "
                     + clazz.getName() + " is not subtype of interface.");
         }
+        //类被标注@Adaptive注解
         if (clazz.isAnnotationPresent(Adaptive.class)) {
             cacheAdaptiveClass(clazz);
         } else if (isWrapperClass(clazz)) {
+            //包装类
             cacheWrapperClass(clazz);
         } else {
+            //判断类是否有无参构造函数
             clazz.getConstructor();
             if (StringUtils.isEmpty(name)) {
                 name = findAnnotationName(clazz);
@@ -843,6 +890,7 @@ public class ExtensionLoader<T> {
 
             String[] names = NAME_SEPARATOR.split(name);
             if (ArrayUtils.isNotEmpty(names)) {
+                //缓存类被@Activate标记
                 cacheActivateClass(clazz, names[0]);
                 for (String n : names) {
                     cacheName(clazz, n);

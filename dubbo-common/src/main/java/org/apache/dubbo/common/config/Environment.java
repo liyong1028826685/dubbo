@@ -34,14 +34,18 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Environment extends LifecycleAdapter implements FrameworkExt {
     public static final String NAME = "environment";
-
+    /** 属性配置 */
     private Map<String, PropertiesConfiguration> propertiesConfigs = new ConcurrentHashMap<>();
+    /** 系统 属性配置  */
     private Map<String, SystemConfiguration> systemConfigs = new ConcurrentHashMap<>();
     private Map<String, EnvironmentConfiguration> environmentConfigs = new ConcurrentHashMap<>();
+    /** 外部配置：全局配置 */
     private Map<String, InmemoryConfiguration> externalConfigs = new ConcurrentHashMap<>();
+    /** 外部配置：app级别配置   */
     private Map<String, InmemoryConfiguration> appExternalConfigs = new ConcurrentHashMap<>();
-
+    /** 全局的配置 */
     private Map<String, String> externalConfigurationMap = new HashMap<>();
+    /** 应用级别的配置 */
     private Map<String, String> appExternalConfigurationMap = new HashMap<>();
 
     private boolean configCenterFirst = true;
@@ -51,6 +55,7 @@ public class Environment extends LifecycleAdapter implements FrameworkExt {
     @Override
     public void initialize() throws IllegalStateException {
         ConfigManager configManager = ApplicationModel.getConfigManager();
+        //获取本地配置中心信息
         Optional<Collection<ConfigCenterConfig>> defaultConfigs = configManager.getDefaultConfigCenter();
         defaultConfigs.ifPresent(configs -> {
             for (ConfigCenterConfig config : configs) {
@@ -123,16 +128,19 @@ public class Environment extends LifecycleAdapter implements FrameworkExt {
      * Otherwise, if use cache, we should make sure each Config has a unique id which is difficult to guarantee because is on the user's side,
      * especially when it comes to ServiceConfig and ReferenceConfig.
      *
-     * @param prefix
-     * @param id
+     * @param prefix 例如：dubbo.application
+     * @param id 例如：demo-provider
      * @return
      */
     public CompositeConfiguration getConfiguration(String prefix, String id) {
         CompositeConfiguration compositeConfiguration = new CompositeConfiguration();
-        // Config center has the highest priority
+        // Config center has the highest priority 以下配置使用List保存也就说明是添加顺序就是优先级顺序
+        //系统配置优先级最高
         compositeConfiguration.addConfiguration(this.getSystemConfig(prefix, id));
         compositeConfiguration.addConfiguration(this.getEnvironmentConfig(prefix, id));
+        //应用级配置优先级比全局配置高
         compositeConfiguration.addConfiguration(this.getAppExternalConfig(prefix, id));
+        //全局配置
         compositeConfiguration.addConfiguration(this.getExternalConfig(prefix, id));
         compositeConfiguration.addConfiguration(this.getPropertiesConfig(prefix, id));
         return compositeConfiguration;
