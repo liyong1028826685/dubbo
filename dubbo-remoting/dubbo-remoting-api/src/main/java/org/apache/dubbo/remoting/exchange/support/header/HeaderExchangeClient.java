@@ -40,7 +40,7 @@ import static org.apache.dubbo.remoting.Constants.TICKS_PER_WHEEL;
 import static org.apache.dubbo.remoting.utils.UrlUtils.getHeartbeat;
 import static org.apache.dubbo.remoting.utils.UrlUtils.getIdleTimeout;
 
-/**
+/**消费者默认客户端
  * DefaultMessageClient
  */
 public class HeaderExchangeClient implements ExchangeClient {

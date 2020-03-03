@@ -182,7 +182,7 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
             bootstrap = DubboBootstrap.getInstance();
             bootstrap.init();
         }
-
+        //配置属性、参数校验
         checkAndUpdateSubConfigs();
 
         //init serivceMetadata
@@ -193,15 +193,18 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
         serviceMetadata.setServiceInterfaceName(interfaceName);
         // TODO, uncomment this line once service key is unified
         serviceMetadata.setServiceKey(URL.buildKey(interfaceName, group, version));
-
+        //本地存根check
         checkStubAndLocal(interfaceClass);
+        //mock检测
         ConfigValidationUtils.checkMock(interfaceClass, this);
 
         Map<String, String> map = new HashMap<String, String>();
+        //标识是消费端还是提供端
         map.put(SIDE_KEY, CONSUMER_SIDE);
 
         ReferenceConfigBase.appendRuntimeParameters(map);
         if (!ProtocolUtils.isGeneric(generic)) {
+            //获取版本号
             String revision = Version.getVersion(interfaceClass, version);
             if (revision != null && revision.length() > 0) {
                 map.put(REVISION_KEY, revision);
@@ -228,6 +231,7 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
             attributes = new HashMap<>();
             for (MethodConfig methodConfig : getMethods()) {
                 AbstractConfig.appendParameters(map, methodConfig, methodConfig.getName());
+                //方法重试配置
                 String retryKey = methodConfig.getName() + ".retry";
                 if (map.containsKey(retryKey)) {
                     String retryValue = map.remove(retryKey);
@@ -285,7 +289,7 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
             }
         } else {
             urls.clear();
-            if (url != null && url.length() > 0) { // user specified URL, could be peer-to-peer address, or register center's address.
+            if (url != null && url.length() > 0) { // user specified URL, could be peer-to-peer address, or register center's address.直连
                 String[] us = SEMICOLON_SPLIT_PATTERN.split(url);
                 if (us != null && us.length > 0) {
                     for (String u : us) {
@@ -319,8 +323,9 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
                     }
                 }
             }
-
+            //Protocol==registry -> ProtocolListenerWrapper->ProtocolFilterWrapper->RegistryProtocol
             if (urls.size() == 1) {
+                //MockClusterInvoker->ConsumerContextClusterInterceptor->FailoverClusterInvoker
                 invoker = REF_PROTOCOL.refer(interfaceClass, urls.get(0));
             } else {
                 List<Invoker<?>> invokers = new ArrayList<Invoker<?>>();
@@ -368,7 +373,7 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
             metadataService.publishServiceDefinition(consumerURL);
         }
         // create service proxy
-        return (T) PROXY_FACTORY.getProxy(invoker);
+        return (T) PROXY_FACTORY.getProxy(invoker);//StubProxyFactoryWrapper->JavassistProxyFactory
     }
 
     /**
@@ -382,6 +387,7 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
         completeCompoundConfigs();
         // get consumer's global configuration
         checkDefault();
+        //获取属性配置
         this.refresh();
         if (getGeneric() == null && getConsumer() != null) {
             setGeneric(getConsumer().getGeneric());
@@ -397,6 +403,7 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
             }
             checkInterfaceAndMethods(interfaceClass, getMethods());
         }
+        //直连提供者配置
         resolveFile();
         ConfigValidationUtils.validateReferenceConfig(this);
         appendParameters();

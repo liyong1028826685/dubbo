@@ -188,6 +188,7 @@ final public class MockInvoker<T> implements Invoker<T> {
         }
 
         try {
+            //和存根不同这里不需要代理源对象
             return mockClass.newInstance();
         } catch (InstantiationException e) {
             throw new IllegalStateException("No default constructor from mock class " + mockClass.getName(), e);
@@ -198,6 +199,9 @@ final public class MockInvoker<T> implements Invoker<T> {
 
 
     /**
+     *
+     * mock指定的字符串解析处理
+     *
      * Normalize mock string:
      *
      * <ol>

@@ -169,9 +169,9 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
 
     public void subscribe(URL url) {
         setConsumerUrl(url);
-        CONSUMER_CONFIGURATION_LISTENER.addNotifyListener(this);
+        CONSUMER_CONFIGURATION_LISTENER.addNotifyListener(this);//注册监听器
         serviceConfigurationListener = new ReferenceConfigurationListener(this, url);
-        registry.subscribe(url, this);
+        registry.subscribe(url, this);//ListenerRegistryWrapper
     }
 
 
@@ -223,10 +223,10 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
                     }
                     return "";
                 }));
-
+        //configurators
         List<URL> configuratorURLs = categoryUrls.getOrDefault(CONFIGURATORS_CATEGORY, Collections.emptyList());
         this.configurators = Configurator.toConfigurators(configuratorURLs).orElse(this.configurators);
-
+        //routers
         List<URL> routerURLs = categoryUrls.getOrDefault(ROUTERS_CATEGORY, Collections.emptyList());
         toRouters(routerURLs).ifPresent(this::addRouters);
 
@@ -266,7 +266,7 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
     // TODO: 2017/8/31 FIXME The thread pool should be used to refresh the address, otherwise the task may be accumulated.
     private void refreshInvoker(List<URL> invokerUrls) {
         Assert.notNull(invokerUrls, "invokerUrls should not be null");
-
+        //通知内容为：empty://xxx 表示没有提供者可用或禁止调用
         if (invokerUrls.size() == 1
                 && invokerUrls.get(0) != null
                 && EMPTY_PROTOCOL.equals(invokerUrls.get(0).getProtocol())) {
@@ -281,10 +281,10 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
                 invokerUrls = new ArrayList<>();
             }
             if (invokerUrls.isEmpty() && this.cachedInvokerUrls != null) {
-                invokerUrls.addAll(this.cachedInvokerUrls);
+                invokerUrls.addAll(this.cachedInvokerUrls);//取缓存数据
             } else {
                 this.cachedInvokerUrls = new HashSet<>();
-                this.cachedInvokerUrls.addAll(invokerUrls);//Cached invoker urls, convenient for comparison
+                this.cachedInvokerUrls.addAll(invokerUrls);//更新缓存 Cached invoker urls, convenient for comparison
             }
             if (invokerUrls.isEmpty()) {
                 return;
@@ -431,8 +431,8 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
                     } else {
                         enabled = url.getParameter(ENABLED_KEY, true);
                     }
-                    if (enabled) {
-                        invoker = new InvokerDelegate<>(protocol.refer(serviceType, url), url, providerUrl);
+                    if (enabled) {//protocol：ProtocolFilterWrapper->ProtocolListenerWrapper->DubboProtocol
+                        invoker = new InvokerDelegate<>(protocol.refer(serviceType, url), url, providerUrl);//Invoker包装：InvokerDelegate->ListenerInvokerWrapper->AsyncToSyncInvoker->DubboInvoker
                     }
                 } catch (Throwable t) {
                     logger.error("Failed to refer invoker for interface:" + serviceType + ",url:(" + url + ")" + t.getMessage(), t);
@@ -633,7 +633,7 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
         }
         return false;
     }
-
+    //构建路由规则
     public void buildRouterChain(URL url) {
         this.setRouterChain(RouterChain.buildChain(url));
     }

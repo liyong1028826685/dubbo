@@ -29,6 +29,9 @@ import org.apache.dubbo.rpc.RpcException;
 import java.util.List;
 
 /**
+ *
+ * Invoker引用和销毁监听包装
+ *
  * ListenerInvoker
  */
 public class ListenerInvokerWrapper<T> implements Invoker<T> {
@@ -49,6 +52,7 @@ public class ListenerInvokerWrapper<T> implements Invoker<T> {
             for (InvokerListener listener : listeners) {
                 if (listener != null) {
                     try {
+                        //服务引用监听
                         listener.referred(invoker);
                     } catch (Throwable t) {
                         logger.error(t.getMessage(), t);
@@ -92,6 +96,7 @@ public class ListenerInvokerWrapper<T> implements Invoker<T> {
                 for (InvokerListener listener : listeners) {
                     if (listener != null) {
                         try {
+                            //引用销毁监听
                             listener.destroyed(invoker);
                         } catch (Throwable t) {
                             logger.error(t.getMessage(), t);

@@ -45,10 +45,22 @@ public class RouterChain<T> {
     public static <T> RouterChain<T> buildChain(URL url) {
         return new RouterChain<>(url);
     }
-
+    /***
+     *
+     * 0 = {MockRouterFactory@4378}
+     * 1 = {TagRouterFactory@4380}
+     * 2 = {AppRouterFactory@4374}
+     * 3 = {ServiceRouterFactory@4376}
+     *
+     * @author liyong
+     * @date 23:52 2020-03-02
+     * @param url
+     * @exception
+     * @return
+     **/
     private RouterChain(URL url) {
         List<RouterFactory> extensionFactories = ExtensionLoader.getExtensionLoader(RouterFactory.class)
-                .getActivateExtension(url, "router");
+                .getActivateExtension(url, "router");//类被@Activate标注
 
         List<Router> routers = extensionFactories.stream()
                 .map(factory -> factory.getRouter(url))
@@ -88,7 +100,11 @@ public class RouterChain<T> {
     }
 
     /**
-     *
+     * TODO 路由规则
+     * 0 = {MockInvokersSelector@3877} Integer.MIN
+     * 1 = {TagRouter@3878} 100
+     * 2 = {AppRouter@3879} 150
+     * 3 = {ServiceRouter@3880} 140
      * @param url
      * @param invocation
      * @return

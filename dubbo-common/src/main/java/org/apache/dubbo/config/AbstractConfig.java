@@ -201,6 +201,17 @@ public abstract class AbstractConfig implements Serializable {
         }
     }
 
+    /***
+     *
+     * 事件通知回掉接口方法解析：当服务器端某个方法被调用之前、调用之后、出现异常时，会触发 oninvoke、onreturn、onthrow 三个事件，可以配置当事件发生时，通知哪个类的哪个方法
+     *  <dubbo:method ></dubbo:method> 相关方法参数解析
+     *
+     * @author liyong
+     * @date 16:52 2020-03-02
+     * @param methodConfig
+     * @exception
+     * @return org.apache.dubbo.rpc.model.ConsumerModel.AsyncMethodInfo
+     **/
     public static ConsumerModel.AsyncMethodInfo convertMethodConfig2AsyncInfo(MethodConfig methodConfig) {
         if (methodConfig == null || (methodConfig.getOninvoke() == null && methodConfig.getOnreturn() == null && methodConfig.getOnthrow() == null)) {
             return null;

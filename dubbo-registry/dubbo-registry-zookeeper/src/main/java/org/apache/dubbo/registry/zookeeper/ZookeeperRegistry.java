@@ -176,6 +176,11 @@ public class ZookeeperRegistry extends FailbackRegistry {
                 }
             } else {
                 List<URL> urls = new ArrayList<>();
+                /**比如：
+                 * 0 = "/dubbo/org.apache.dubbo.demo.DemoService/providers"
+                 * 1 = "/dubbo/org.apache.dubbo.demo.DemoService/configurators"
+                 * 2 = "/dubbo/org.apache.dubbo.demo.DemoService/routers"
+                 */
                 for (String path : toCategoriesPath(url)) {
                     ConcurrentMap<NotifyListener, ChildListener> listeners = zkListeners.get(url);
                     if (listeners == null) {

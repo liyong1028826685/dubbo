@@ -261,6 +261,7 @@ public class ConfigValidationUtils {
     }
 
     /**
+     * Mock语法合法性检测
      * Legitimacy check and setup of local simulated operations. The operations can be a string with Simple operation or
      * a classname whose {@link Class} implements a particular function
      *
@@ -272,8 +273,9 @@ public class ConfigValidationUtils {
         if (ConfigUtils.isEmpty(mock)) {
             return;
         }
-
+        //对mock指定的字符串进行统一处理
         String normalizedMock = MockInvoker.normalizeMock(mock);
+        //mock="return xxx"
         if (normalizedMock.startsWith(RETURN_PREFIX)) {
             normalizedMock = normalizedMock.substring(RETURN_PREFIX.length()).trim();
             try {
@@ -283,6 +285,7 @@ public class ConfigValidationUtils {
                 throw new IllegalStateException("Illegal mock return in <dubbo:service/reference ... " +
                         "mock=\"" + mock + "\" />");
             }
+            //mock="throw xxx"
         } else if (normalizedMock.startsWith(THROW_PREFIX)) {
             normalizedMock = normalizedMock.substring(THROW_PREFIX.length()).trim();
             if (ConfigUtils.isNotEmpty(normalizedMock)) {
@@ -295,6 +298,7 @@ public class ConfigValidationUtils {
                 }
             }
         } else {
+            //Mock类是否实现这个接口并且是否有这个接口类型的构造函数对这个对象进行封装或代理
             //Check whether the mock class is a implementation of the interfaceClass, and if it has a default constructor
             MockInvoker.getMockObject(normalizedMock, interfaceClass);
         }

@@ -24,6 +24,7 @@
     <dubbo:application name="demo-consumer" logger="log4j"/>
 
     <dubbo:config-center address="zookeeper://127.0.0.1:2181" />
+    <dubbo:consumer listener="invokerListener"/>
 
 <!--    <dubbo:registry address="zookeeper://127.0.0.1:2181"/>-->
 
@@ -34,16 +35,18 @@
     3.通过文件映射 -Ddubbo.resolve.file , java -Ddubbo.resolve.file=xxx.properties
     -->
 
-    <dubbo:reference id="demoService2" check="false" interface="org.apache.dubbo.demo.DemoService" group="demo2" mock="force">
+    <bean id ="demoCallback" class = "org.apache.dubbo.demo.consumer.NotifyImpl" />
+
+    <dubbo:reference id="demoService2" check="false" interface="org.apache.dubbo.demo.DemoService" group="demo2" mock="force" >
 <!--        <dubbo:method name="sayHello"  cache="lru"/>-->
-        <dubbo:method name="sayHello"  async="true"/>
+        <dubbo:method name="sayHello"  async="true" return="true" onreturn="demoCallback.onreturn" onthrow="demoCallback.onthrow"/>
     </dubbo:reference>
 
-    <dubbo:reference id="demoService" check="false" interface="org.apache.dubbo.demo.DemoService" group="demo1,demo2" merger="true" >
+    <dubbo:reference id="demoService" check="false" interface="org.apache.dubbo.demo.DemoService" group="demo1,demo2" merger="true"  >
 <!-- 如果定义多个merger 不指定merger默认使用第一个加载的，  对方法特殊自定    <dubbo:method  name="sayHello" merger="demoMerger2"/>-->
         <dubbo:method name="sayHello"  cache="lru"/>
     </dubbo:reference>
 
-    <dubbo:reference id="validationService" check="false" interface="org.apache.dubbo.demo.ValidationService" validation="false"/>
+    <dubbo:reference id="validationService" check="false" interface="org.apache.dubbo.demo.ValidationService" validation="false" scope="local"/>
 
 </beans>

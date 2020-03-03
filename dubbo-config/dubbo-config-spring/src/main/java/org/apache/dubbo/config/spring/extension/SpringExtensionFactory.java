@@ -36,6 +36,7 @@ public class SpringExtensionFactory implements ExtensionFactory {
 
     private static final Set<ApplicationContext> CONTEXTS = new ConcurrentHashSet<ApplicationContext>();
 
+    //Fixme 这个地方会被重复调用，不过这里使用Set和shutdownHook在注册的时候进行了判断 个人认为问题不大
     public static void addApplicationContext(ApplicationContext context) {
         CONTEXTS.add(context);
         if (context instanceof ConfigurableApplicationContext) {

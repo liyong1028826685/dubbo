@@ -154,7 +154,17 @@ public final class Version {
         }
         return "";
     }
-
+    /***
+     *
+     * 首先从Package获取版本 -> 获取不到在从jar包中获取版本号 -> 默认版本号
+     *
+     * @author liyong
+     * @date 16:36 2020-03-02
+     * @param cls
+ * @param defaultVersion
+     * @exception
+     * @return java.lang.String
+     **/
     public static String getVersion(Class<?> cls, String defaultVersion) {
         try {
             // find version info from MANIFEST.MF first

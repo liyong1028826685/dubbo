@@ -229,6 +229,7 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
 
 
     /**
+     * 本地存根检测
      * Legitimacy check of stub, note that: the local will deprecated, and replace with <code>stub</code>
      *
      * @param interfaceClass for provider side, it is the {@link Class} of the service that will be exported; for consumer

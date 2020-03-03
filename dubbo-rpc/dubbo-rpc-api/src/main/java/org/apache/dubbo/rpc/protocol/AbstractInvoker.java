@@ -159,7 +159,7 @@ public abstract class AbstractInvoker<T> implements Invoker<T> {
 
         AsyncRpcResult asyncResult;
         try {
-            asyncResult = (AsyncRpcResult) doInvoke(invocation);
+            asyncResult = (AsyncRpcResult) doInvoke(invocation);//远程服务调用
         } catch (InvocationTargetException e) { // biz exception
             Throwable te = e.getTargetException();
             if (te == null) {
@@ -179,11 +179,12 @@ public abstract class AbstractInvoker<T> implements Invoker<T> {
         } catch (Throwable e) {
             asyncResult = AsyncRpcResult.newDefaultAsyncResult(null, e, invocation);
         }
-        RpcContext.getContext().setFuture(new FutureAdapter(asyncResult.getResponseFuture()));
+        RpcContext.getContext().setFuture(new FutureAdapter(asyncResult.getResponseFuture()));//结果获取 1.RpcContext获取Future 2. FutureContext.getContext()
         return asyncResult;
     }
 
     protected ExecutorService getCallbackExecutor(URL url, Invocation inv) {
+        //获取线程池
         ExecutorService sharedExecutor = ExtensionLoader.getExtensionLoader(ExecutorRepository.class).getDefaultExtension().getExecutor(url);
         if (InvokeMode.SYNC == RpcUtils.getInvokeMode(getUrl(), inv)) {
             return new ThreadlessExecutor(sharedExecutor);

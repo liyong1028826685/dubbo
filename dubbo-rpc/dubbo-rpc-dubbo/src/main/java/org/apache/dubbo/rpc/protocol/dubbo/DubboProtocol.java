@@ -361,7 +361,7 @@ public class DubboProtocol extends AbstractProtocol {
 
         return new DubboProtocolServer(server);
     }
-
+    //序列化优化，可以自定义需要优化的类
     private void optimizeSerialization(URL url) throws RpcException {
         String className = url.getParameter(OPTIMIZER_KEY, "");
         if (StringUtils.isEmpty(className) || optimizers.contains(className)) {
@@ -433,10 +433,10 @@ public class DubboProtocol extends AbstractProtocol {
         ExchangeClient[] clients = new ExchangeClient[connections];
         for (int i = 0; i < clients.length; i++) {
             if (useShareConnect) {
-                clients[i] = shareClients.get(i);
+                clients[i] = shareClients.get(i);//共享连接
 
             } else {
-                clients[i] = initClient(url);
+                clients[i] = initClient(url);//不共享 新建连接
             }
         }
 
@@ -547,7 +547,7 @@ public class DubboProtocol extends AbstractProtocol {
         List<ReferenceCountExchangeClient> clients = new ArrayList<>();
 
         for (int i = 0; i < connectNum; i++) {
-            clients.add(buildReferenceCountExchangeClient(url));
+            clients.add(buildReferenceCountExchangeClient(url));//ReferenceCountExchangeClient->HeaderExchangeClient
         }
 
         return clients;
@@ -592,7 +592,7 @@ public class DubboProtocol extends AbstractProtocol {
                 client = new LazyConnectExchangeClient(url, requestHandler);
 
             } else {
-                client = Exchangers.connect(url, requestHandler);
+                client = Exchangers.connect(url, requestHandler);//HeaderExchangeClient 连接到服务器
             }
 
         } catch (RemotingException e) {

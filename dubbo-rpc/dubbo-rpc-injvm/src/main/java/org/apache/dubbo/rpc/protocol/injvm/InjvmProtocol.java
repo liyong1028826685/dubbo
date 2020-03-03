@@ -96,7 +96,23 @@ public class InjvmProtocol extends AbstractProtocol implements Protocol {
     public <T> Invoker<T> protocolBindingRefer(Class<T> serviceType, URL url) throws RpcException {
         return new InjvmInvoker<T>(serviceType, url, url.getServiceKey(), exporterMap);
     }
-
+    /***
+     *
+     * 判断是否本地调用
+     *
+     * 本地调用
+     * 1.scope=local 或者injvm=true
+     * 2.如果本地暴露服务
+     * 远程调用
+     * 3.scope=remote
+     * 4.泛形调用
+     *
+     * @author liyong
+     * @date 22:38 2020-03-02
+     * @param url
+     * @exception
+     * @return boolean
+     **/
     public boolean isInjvmRefer(URL url) {
         String scope = url.getParameter(SCOPE_KEY);
         // Since injvm protocol is configured explicitly, we don't need to set any extra flag, use normal refer process.

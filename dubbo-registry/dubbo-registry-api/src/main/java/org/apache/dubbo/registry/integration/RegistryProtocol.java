@@ -402,10 +402,10 @@ public class RegistryProtocol implements Protocol {
         String group = qs.get(GROUP_KEY);
         if (group != null && group.length() > 0) {
             if ((COMMA_SPLIT_PATTERN.split(group)).length > 1 || "*".equals(group)) {
-                return doRefer(getMergeableCluster(), registry, type, url);
+                return doRefer(getMergeableCluster(), registry, type, url);//存在多个分组使用MergeableCluster
             }
         }
-        return doRefer(cluster, registry, type, url);
+        return doRefer(cluster, registry, type, url);//MockClusterWrapper->FailoverCluster
     }
 
     private Cluster getMergeableCluster() {
@@ -413,21 +413,21 @@ public class RegistryProtocol implements Protocol {
     }
 
     private <T> Invoker<T> doRefer(Cluster cluster, Registry registry, Class<T> type, URL url) {
-        RegistryDirectory<T> directory = new RegistryDirectory<T>(type, url);
+        RegistryDirectory<T> directory = new RegistryDirectory<T>(type, url);//本地服务目录，注册中心的映射
         directory.setRegistry(registry);
         directory.setProtocol(protocol);
         // all attributes of REFER_KEY
         Map<String, String> parameters = new HashMap<String, String>(directory.getUrl().getParameters());
         URL subscribeUrl = new URL(CONSUMER_PROTOCOL, parameters.remove(REGISTER_IP_KEY), 0, type.getName(), parameters);
         if (!ANY_VALUE.equals(url.getServiceInterface()) && url.getParameter(REGISTER_KEY, true)) {
-            directory.setRegisteredConsumerUrl(getRegisteredConsumerUrl(subscribeUrl, url));
-            registry.register(directory.getRegisteredConsumerUrl());
+            directory.setRegisteredConsumerUrl(getRegisteredConsumerUrl(subscribeUrl, url));//增加category=consumers
+            registry.register(directory.getRegisteredConsumerUrl());//注册中心注册消费者，ListenerRegistryWrapper
         }
-        directory.buildRouterChain(subscribeUrl);
+        directory.buildRouterChain(subscribeUrl);//构建路由规则
         directory.subscribe(subscribeUrl.addParameter(CATEGORY_KEY,
-                PROVIDERS_CATEGORY + "," + CONFIGURATORS_CATEGORY + "," + ROUTERS_CATEGORY));
-
-        Invoker invoker = cluster.join(directory);
+                PROVIDERS_CATEGORY + "," + CONFIGURATORS_CATEGORY + "," + ROUTERS_CATEGORY));//url增加category=providers,configurators,routers
+        //cluster:MockClusterWrapper->FailoverCluster
+        Invoker invoker = cluster.join(directory);//Invoker:MockClusterInvoker->ConsumerContextClusterInterceptor(拦截器链)->FailoverClusterInvoker
         return invoker;
     }
 

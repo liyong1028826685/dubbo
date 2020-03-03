@@ -54,7 +54,7 @@ public class ListenerRegistryWrapper implements Registry {
     @Override
     public void register(URL url) {
         try {
-            registry.register(url);
+            registry.register(url);//ZookeeperRegistry
         } finally {
             if (CollectionUtils.isNotEmpty(listeners)) {
                 RuntimeException exception = null;

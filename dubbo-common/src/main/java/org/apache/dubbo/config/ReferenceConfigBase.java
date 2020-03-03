@@ -261,12 +261,28 @@ public abstract class ReferenceConfigBase<T> extends AbstractReferenceConfig {
         return DUBBO + ".reference." + interfaceName;
     }
 
+    /***
+     *
+     * 直连配置
+     * 1.从系统属性获取
+     * 2.通过文件映射
+     * 3.xml直接配置 <dubbo:reference url="">
+     *
+     * @author liyong
+     * @date 15:51 2020-03-02
+     * @param
+     * @exception
+     * @return void
+     **/
     public void resolveFile() {
+        //从系统属性获取
         String resolve = System.getProperty(interfaceName);
         String resolveFile = null;
         if (StringUtils.isEmpty(resolve)) {
+            //自定义路径
             resolveFile = System.getProperty("dubbo.resolve.file");
             if (StringUtils.isEmpty(resolveFile)) {
+                //默认路径
                 File userResolveFile = new File(new File(System.getProperty("user.home")), "dubbo-resolve.properties");
                 if (userResolveFile.exists()) {
                     resolveFile = userResolveFile.getAbsolutePath();

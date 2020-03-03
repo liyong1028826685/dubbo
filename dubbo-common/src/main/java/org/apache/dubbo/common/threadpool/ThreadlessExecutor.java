@@ -114,9 +114,9 @@ public class ThreadlessExecutor extends AbstractExecutorService {
     @Override
     public void execute(Runnable runnable) {
         synchronized (lock) {
-            if (!waiting) {
+            if (!waiting) {//不等待，直接执行
                 sharedExecutor.execute(runnable);
-            } else {
+            } else {//放入队列
                 queue.add(runnable);
             }
         }

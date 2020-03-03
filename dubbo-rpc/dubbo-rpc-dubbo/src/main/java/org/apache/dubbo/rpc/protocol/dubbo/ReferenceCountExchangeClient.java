@@ -34,7 +34,7 @@ import static org.apache.dubbo.remoting.Constants.RECONNECT_KEY;
 import static org.apache.dubbo.remoting.Constants.SEND_RECONNECT_KEY;
 import static org.apache.dubbo.rpc.protocol.dubbo.Constants.LAZY_CONNECT_INITIAL_STATE_KEY;
 
-/**
+/**消费者端计数
  * dubbo protocol support class.
  */
 @SuppressWarnings("deprecation")

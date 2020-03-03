@@ -90,7 +90,7 @@ final class LazyConnectExchangeClient implements ExchangeClient {
     @Override
     public CompletableFuture<Object> request(Object request) throws RemotingException {
         warning();
-        initClient();
+        initClient();//延迟连接，请求时候在连接
         return client.request(request);
     }
 
