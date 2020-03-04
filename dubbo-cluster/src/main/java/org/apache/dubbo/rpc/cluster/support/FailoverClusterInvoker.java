@@ -75,10 +75,12 @@ public class FailoverClusterInvoker<T> extends AbstractClusterInvoker<T> {
                 // check again
                 checkInvokers(copyInvokers, invocation);
             }
+            //根据负载配置策略获取Invoker
             Invoker<T> invoker = select(loadbalance, invocation, copyInvokers, invoked);
             invoked.add(invoker);
             RpcContext.getContext().setInvokers((List) invoked);
             try {
+                //RegistryDirectory$InvokerDelegate ,执行调用InvokerDelegate->Invoker(包装Filter链)->ListenerInvokerWrapper->AsyncToSyncInvoker->DubboInvoker
                 Result result = invoker.invoke(invocation);
                 if (le != null && logger.isWarnEnabled()) {
                     logger.warn("Although retry the method " + methodName

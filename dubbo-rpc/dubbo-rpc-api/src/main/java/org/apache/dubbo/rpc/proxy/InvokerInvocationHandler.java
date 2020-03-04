@@ -25,6 +25,8 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
 /**
+ * InvokerInvocationHandler->MockClusterInvoker->AbstractCluster.InterceptorInvokerNode->ConsumerContextClusterInterceptor->FailoverClusterInvoker
+ *
  * InvokerHandler
  */
 public class InvokerInvocationHandler implements InvocationHandler {
@@ -54,9 +56,10 @@ public class InvokerInvocationHandler implements InvocationHandler {
         } else if (parameterTypes.length == 1 && "equals".equals(methodName)) {
             return invoker.equals(args[0]);
         }
+        //包装RPC请求
         RpcInvocation rpcInvocation = new RpcInvocation(method, invoker.getInterface().getName(), args);
         rpcInvocation.setTargetServiceUniqueName(invoker.getUrl().getServiceKey());
-
+        //MockClusterInvoker->AbstractCluster.InterceptorInvokerNode->ConsumerContextClusterInterceptor->FailoverClusterInvoker
         return invoker.invoke(rpcInvocation).recreate();
     }
 }

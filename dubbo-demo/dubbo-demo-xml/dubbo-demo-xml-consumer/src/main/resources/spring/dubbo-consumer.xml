@@ -21,10 +21,12 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
        http://dubbo.apache.org/schema/dubbo http://dubbo.apache.org/schema/dubbo/dubbo.xsd">
 
-    <dubbo:application name="demo-consumer" logger="log4j"/>
+    <dubbo:application name="demo-consumer" logger="log4j" />
 
     <dubbo:config-center address="zookeeper://127.0.0.1:2181" />
     <dubbo:consumer listener="invokerListener"/>
+
+    <dubbo:consumer /><!--tag="tag2"-->
 
 <!--    <dubbo:registry address="zookeeper://127.0.0.1:2181"/>-->
 
@@ -47,6 +49,6 @@
         <dubbo:method name="sayHello"  cache="lru"/>
     </dubbo:reference>
 
-    <dubbo:reference id="validationService" check="false" interface="org.apache.dubbo.demo.ValidationService" validation="false" scope="local"/>
+    <dubbo:reference id="validationService" check="false" interface="org.apache.dubbo.demo.ValidationService" validation="false"/>
 
 </beans>

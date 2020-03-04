@@ -48,10 +48,21 @@ public class ProtocolFilterWrapper implements Protocol {
         }
         this.protocol = protocol;
     }
-
+    /***
+     *
+     * 过滤链转换为Invoker调用链
+     *
+     * @author liyong
+     * @date 17:40 2020-03-04
+     * @param invoker
+ * @param key
+ * @param group
+     * @exception
+     * @return org.apache.dubbo.rpc.Invoker<T>
+     **/
     private static <T> Invoker<T> buildInvokerChain(final Invoker<T> invoker, String key, String group) {
         Invoker<T> last = invoker;
-        List<Filter> filters = ExtensionLoader.getExtensionLoader(Filter.class).getActivateExtension(invoker.getUrl(), key, group);
+        List<Filter> filters = ExtensionLoader.getExtensionLoader(Filter.class).getActivateExtension(invoker.getUrl(), key, group);//过滤链
 
         if (!filters.isEmpty()) {
             for (int i = filters.size() - 1; i >= 0; i--) {
@@ -94,6 +105,7 @@ public class ProtocolFilterWrapper implements Protocol {
 
                         }
                         return asyncResult.whenCompleteWithContext((r, t) -> {
+                            //处理回掉或监听事件
                             if (filter instanceof ListenableFilter) {// Deprecated!
                                 Filter.Listener listener = ((ListenableFilter) filter).listener();
                                 if (listener != null) {
@@ -142,6 +154,7 @@ public class ProtocolFilterWrapper implements Protocol {
         if (UrlUtils.isRegistry(invoker.getUrl())) {
             return protocol.export(invoker);
         }
+        //
         return protocol.export(buildInvokerChain(invoker, SERVICE_FILTER_KEY, CommonConstants.PROVIDER));
     }
 

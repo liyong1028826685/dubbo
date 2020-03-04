@@ -41,17 +41,28 @@ public class Application {
 //            TimeUnit.SECONDS.sleep(1);
 //        }
 
-        //checkParameters();
+        for(int i=0;i<10;i++){
+            checkParameters();
+        }
+
 
 //        mock();
 
-        asyncCall();
+//        asyncCall();
 
 //        asyncRPCContext();
 
 //        async();
 
+//        sync();
+
         //System.in.read();
+    }
+
+    private static void sync(){
+        DemoService demoService = context.getBean("demoService", DemoService.class);
+        String result = demoService.sayHello("hello");
+        System.out.println(result);
     }
 
 

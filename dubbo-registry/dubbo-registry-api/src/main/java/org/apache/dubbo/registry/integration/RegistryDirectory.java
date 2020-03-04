@@ -431,8 +431,10 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
                     } else {
                         enabled = url.getParameter(ENABLED_KEY, true);
                     }
-                    if (enabled) {//protocol：ProtocolFilterWrapper->ProtocolListenerWrapper->DubboProtocol
-                        invoker = new InvokerDelegate<>(protocol.refer(serviceType, url), url, providerUrl);//Invoker包装：InvokerDelegate->ListenerInvokerWrapper->AsyncToSyncInvoker->DubboInvoker
+                    if (enabled) {
+                        //protocol：ProtocolFilterWrapper(包装Filter链)->ProtocolListenerWrapper->DubboProtocol
+                        //Invoker包装：InvokerDelegate->Invoker(ProtocolFilterWrapper包装Filter链)->ListenerInvokerWrapper->AsyncToSyncInvoker->DubboInvoker
+                        invoker = new InvokerDelegate<>(protocol.refer(serviceType, url), url, providerUrl);
                     }
                 } catch (Throwable t) {
                     logger.error("Failed to refer invoker for interface:" + serviceType + ",url:(" + url + ")" + t.getMessage(), t);

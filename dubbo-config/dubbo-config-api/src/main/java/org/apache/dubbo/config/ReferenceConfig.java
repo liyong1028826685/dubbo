@@ -325,7 +325,7 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
             }
             //Protocol==registry -> ProtocolListenerWrapper->ProtocolFilterWrapper->RegistryProtocol
             if (urls.size() == 1) {
-                //MockClusterInvoker->ConsumerContextClusterInterceptor->FailoverClusterInvoker
+                //InvokerInvocationHandler->MockClusterInvoker->AbstractCluster.InterceptorInvokerNode->ConsumerContextClusterInterceptor->FailoverClusterInvoker
                 invoker = REF_PROTOCOL.refer(interfaceClass, urls.get(0));
             } else {
                 List<Invoker<?>> invokers = new ArrayList<Invoker<?>>();
@@ -372,7 +372,7 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
             URL consumerURL = new URL(CONSUMER_PROTOCOL, map.remove(REGISTER_IP_KEY), 0, map.get(INTERFACE_KEY), map);
             metadataService.publishServiceDefinition(consumerURL);
         }
-        // create service proxy
+        // create service proxy  InvokerInvocationHandler->MockClusterInvoker->AbstractCluster.InterceptorInvokerNode->ConsumerContextClusterInterceptor->FailoverClusterInvoker
         return (T) PROXY_FACTORY.getProxy(invoker);//StubProxyFactoryWrapper->JavassistProxyFactory
     }
 
