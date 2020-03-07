@@ -111,7 +111,7 @@ public class ServiceAnnotationBeanPostProcessor implements BeanDefinitionRegistr
 
         // @since 2.7.5
         registerBeans(registry, DubboBootstrapApplicationListener.class);
-
+        //占位符解析
         Set<String> resolvedPackagesToScan = resolvePackagesToScan(packagesToScan);
 
         if (!CollectionUtils.isEmpty(resolvedPackagesToScan)) {
@@ -140,6 +140,7 @@ public class ServiceAnnotationBeanPostProcessor implements BeanDefinitionRegistr
 
         scanner.setBeanNameGenerator(beanNameGenerator);
 
+        //指定扫描的注解
         scanner.addIncludeFilter(new AnnotationTypeFilter(Service.class));
 
         /**
@@ -162,6 +163,7 @@ public class ServiceAnnotationBeanPostProcessor implements BeanDefinitionRegistr
             if (!CollectionUtils.isEmpty(beanDefinitionHolders)) {
 
                 for (BeanDefinitionHolder beanDefinitionHolder : beanDefinitionHolders) {
+                    //被{@link Service}标注的类包装成{@link ServiceBean]}注册到容器中
                     registerServiceBean(beanDefinitionHolder, registry, scanner);
                 }
 
@@ -238,6 +240,7 @@ public class ServiceAnnotationBeanPostProcessor implements BeanDefinitionRegistr
             ClassPathBeanDefinitionScanner scanner, String packageToScan, BeanDefinitionRegistry registry,
             BeanNameGenerator beanNameGenerator) {
 
+        //获取到扫描到的BeanDefinition
         Set<BeanDefinition> beanDefinitions = scanner.findCandidateComponents(packageToScan);
 
         Set<BeanDefinitionHolder> beanDefinitionHolders = new LinkedHashSet<>(beanDefinitions.size());
@@ -255,6 +258,9 @@ public class ServiceAnnotationBeanPostProcessor implements BeanDefinitionRegistr
     }
 
     /**
+     *
+     * 被{@link Service}标注的类包装成{@link ServiceBean]}注册到容器中
+     *
      * Registers {@link ServiceBean} from new annotated {@link Service} {@link BeanDefinition}
      *
      * @param beanDefinitionHolder
@@ -279,6 +285,7 @@ public class ServiceAnnotationBeanPostProcessor implements BeanDefinitionRegistr
 
         String annotatedServiceBeanName = beanDefinitionHolder.getBeanName();
 
+        //构建ServiceBean的BeanDefinition
         AbstractBeanDefinition serviceBeanDefinition =
                 buildServiceBeanDefinition(service, serviceAnnotationAttributes, interfaceClass, annotatedServiceBeanName);
 
@@ -352,10 +359,21 @@ public class ServiceAnnotationBeanPostProcessor implements BeanDefinitionRegistr
 
     }
 
+    /***
+     *
+     * 支持扫描路径占位符解析
+     *
+     * @author liyong
+     * @date 17:43 2020-03-07
+     * @param packagesToScan
+     * @exception
+     * @return java.util.Set<java.lang.String>
+     **/
     private Set<String> resolvePackagesToScan(Set<String> packagesToScan) {
         Set<String> resolvedPackagesToScan = new LinkedHashSet<String>(packagesToScan.size());
         for (String packageToScan : packagesToScan) {
             if (StringUtils.hasText(packageToScan)) {
+                //替换占位符
                 String resolvedPackageToScan = environment.resolvePlaceholders(packageToScan.trim());
                 resolvedPackagesToScan.add(resolvedPackageToScan);
             }
@@ -364,6 +382,8 @@ public class ServiceAnnotationBeanPostProcessor implements BeanDefinitionRegistr
     }
 
     /**
+     *
+     * 构建Dubbo中的ServiceBean
      * Build the {@link AbstractBeanDefinition Bean Definition}
      *
      * @param serviceAnnotation
@@ -386,7 +406,7 @@ public class ServiceAnnotationBeanPostProcessor implements BeanDefinitionRegistr
 
         String[] ignoreAttributeNames = of("provider", "monitor", "application", "module", "registry", "protocol",
                 "interface", "interfaceName", "parameters");
-
+        //添加属性和对应的值，从注解中转换
         propertyValues.addPropertyValues(new AnnotationPropertyValuesAdapter(serviceAnnotation, environment, ignoreAttributeNames));
 
         // References "ref" property to annotated-@Service Bean

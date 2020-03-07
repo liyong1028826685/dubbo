@@ -27,6 +27,9 @@ import java.util.Map;
 import static com.alibaba.spring.util.AnnotationUtils.getAttributes;
 
 /**
+ *
+ * 注解属性转换为PropertyValue
+ *
  * {@link Annotation} {@link PropertyValues} Adapter
  *
  * @see Annotation

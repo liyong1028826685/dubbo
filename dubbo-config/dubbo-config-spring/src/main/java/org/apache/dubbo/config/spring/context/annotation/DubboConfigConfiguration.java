@@ -34,6 +34,11 @@ import com.alibaba.spring.beans.factory.annotation.EnableConfigurationBeanBindin
 import org.springframework.context.annotation.Configuration;
 
 /**
+ *
+ * Dubbo相关配置参数和Bean对象绑定关系：
+ * 1.配置参数前缀
+ * 2.解析成ben的类型
+ *
  * Dubbo {@link AbstractConfig Config} {@link Configuration}
  *
  * @revised 2.7.5
@@ -53,6 +58,7 @@ import org.springframework.context.annotation.Configuration;
 public class DubboConfigConfiguration {
 
     /**
+     * dubbo.protcols.name = rest
      * Single Dubbo {@link AbstractConfig Config} Bean Binding
      */
     @EnableConfigurationBeanBindings({
@@ -73,6 +79,8 @@ public class DubboConfigConfiguration {
     }
 
     /**
+     * 多个配置
+     * dubbo.protcols.rest.name = rest
      * Multiple Dubbo {@link AbstractConfig Config} Bean Binding
      */
     @EnableConfigurationBeanBindings({

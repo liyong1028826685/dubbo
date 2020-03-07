@@ -31,6 +31,7 @@ import static org.apache.dubbo.common.constants.CommonConstants.DEFAULT_TIMEOUT;
 import static org.apache.dubbo.common.constants.CommonConstants.TIMEOUT_KEY;
 
 /**
+ * 客户端和服务器端公共端点抽象
  * AbstractEndpoint
  */
 public abstract class AbstractEndpoint extends AbstractPeer implements Resetable {

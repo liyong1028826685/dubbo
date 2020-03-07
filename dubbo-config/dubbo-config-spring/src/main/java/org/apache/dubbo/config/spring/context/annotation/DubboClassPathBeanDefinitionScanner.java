@@ -28,6 +28,7 @@ import java.util.Set;
 import static org.springframework.context.annotation.AnnotationConfigUtils.registerAnnotationConfigProcessors;
 
 /**
+ * Dubbo相关类扫描器
  * Dubbo {@link ClassPathBeanDefinitionScanner} that exposes some methods to be public.
  *
  * @see #doScan(String...)

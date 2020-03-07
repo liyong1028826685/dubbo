@@ -29,6 +29,20 @@ import org.apache.dubbo.remoting.transport.dispatcher.WrappedChannelHandler;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
 
+/***
+ *@className AllChannelHandler
+ *       
+ *@description 所有处理分发到线程池去处理
+ *       
+ *@author <a href="http://youngitman.tech">青年IT男</a>
+ *       
+ *@date 12:50 2020-03-05
+ *       
+ *@JunitTest: {@link  }     
+ *
+ *@version v1.0.0
+ *       
+**/
 public class AllChannelHandler extends WrappedChannelHandler {
 
     public AllChannelHandler(ChannelHandler handler, URL url) {

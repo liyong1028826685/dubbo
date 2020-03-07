@@ -37,6 +37,20 @@ import java.lang.annotation.Target;
 @Documented
 @EnableDubboConfig
 @DubboComponentScan
+/***
+ *@className EnableDubbo
+ *
+ *@description 1.Enable*注解驱动 2.start模块驱动
+ *
+ *@author <a href="http://youngitman.tech">青年IT男</a>
+ *
+ *@date 17:15 2020-03-07
+ *
+ *@JunitTest: {@link  }
+ *
+ *@version v1.0.0
+ *
+**/
 public @interface EnableDubbo {
 
     /**

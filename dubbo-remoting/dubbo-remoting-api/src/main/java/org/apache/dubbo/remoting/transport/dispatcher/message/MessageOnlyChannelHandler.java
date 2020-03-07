@@ -27,6 +27,20 @@ import org.apache.dubbo.remoting.transport.dispatcher.WrappedChannelHandler;
 
 import java.util.concurrent.ExecutorService;
 
+/***
+ *@className MessageOnlyChannelHandler
+ *
+ *@description 消息接受处理分发到线程池
+ *
+ *@author <a href="http://youngitman.tech">青年IT男</a>
+ *
+ *@date 12:42 2020-03-05
+ *
+ *@JunitTest: {@link  }
+ *
+ *@version v1.0.0
+ *
+**/
 public class MessageOnlyChannelHandler extends WrappedChannelHandler {
 
     public MessageOnlyChannelHandler(ChannelHandler handler, URL url) {

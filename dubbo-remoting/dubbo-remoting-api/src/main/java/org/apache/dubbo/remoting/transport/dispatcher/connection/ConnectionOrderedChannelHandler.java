@@ -40,6 +40,20 @@ import static org.apache.dubbo.remoting.Constants.CONNECT_QUEUE_CAPACITY;
 import static org.apache.dubbo.remoting.Constants.CONNECT_QUEUE_WARNING_SIZE;
 import static org.apache.dubbo.remoting.Constants.DEFAULT_CONNECT_QUEUE_WARNING_SIZE;
 
+/***
+ *@className ConnectionOrderedChannelHandler
+ *
+ *@description 连接相关使用自定义线程池处理，其他使用spi获取的线程池处理
+ *
+ *@author <a href="http://youngitman.tech">青年IT男</a>
+ *
+ *@date 12:28 2020-03-05
+ *
+ *@JunitTest: {@link  }
+ *
+ *@version v1.0.0
+ *
+**/
 public class ConnectionOrderedChannelHandler extends WrappedChannelHandler {
 
     protected final ThreadPoolExecutor connectionExecutor;

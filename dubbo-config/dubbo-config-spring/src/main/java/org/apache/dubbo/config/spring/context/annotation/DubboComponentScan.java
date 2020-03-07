@@ -40,6 +40,20 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Import(DubboComponentScanRegistrar.class)
+/***
+ *@className DubboComponentScan
+ *
+ *@description Dubbo注册扫描 {@link Service}、{@link Reference}
+ *
+ *@author <a href="http://youngitman.tech">青年IT男</a>
+ *
+ *@date 17:21 2020-03-07
+ *
+ *@JunitTest: {@link  }
+ *
+ *@version v1.0.0
+ *
+**/
 public @interface DubboComponentScan {
 
     /**

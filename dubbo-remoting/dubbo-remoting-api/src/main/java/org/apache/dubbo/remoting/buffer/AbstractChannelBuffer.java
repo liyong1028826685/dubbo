@@ -27,9 +27,9 @@ public abstract class AbstractChannelBuffer implements ChannelBuffer {
     private int readerIndex;
 
     private int writerIndex;
-
+    //读标记索引 回滚使用
     private int markedReaderIndex;
-
+    //写标记索引 回滚使用
     private int markedWriterIndex;
 
     @Override

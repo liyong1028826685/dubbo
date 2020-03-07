@@ -28,6 +28,20 @@ import org.apache.dubbo.remoting.transport.dispatcher.WrappedChannelHandler;
 
 import java.util.concurrent.ExecutorService;
 
+/***
+ *@className DirectChannelHandler
+ *
+ *@description 直接执行
+ *
+ *@author <a href="http://youngitman.tech">青年IT男</a>
+ *
+ *@date 12:51 2020-03-05
+ *
+ *@JunitTest: {@link  }
+ *
+ *@version v1.0.0
+ *
+**/
 public class DirectChannelHandler extends WrappedChannelHandler {
 
     public DirectChannelHandler(ChannelHandler handler, URL url) {

@@ -23,6 +23,20 @@ import org.apache.dubbo.remoting.Dispatcher;
 import org.apache.dubbo.remoting.exchange.support.header.HeartbeatHandler;
 import org.apache.dubbo.remoting.transport.MultiMessageHandler;
 
+/***
+ *@className ChannelHandlers
+ *
+ *@description 对ChannelHandler进行HeartbeatHandler和MultiMessageHandler增强
+ *
+ *@author <a href="http://youngitman.tech">青年IT男</a>
+ *
+ *@date 12:58 2020-03-05
+ *
+ *@JunitTest: {@link  }
+ *
+ *@version v1.0.0
+ *
+**/
 public class ChannelHandlers {
 
     private static ChannelHandlers INSTANCE = new ChannelHandlers();
