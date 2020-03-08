@@ -159,7 +159,8 @@ public abstract class AbstractInvoker<T> implements Invoker<T> {
 
         AsyncRpcResult asyncResult;
         try {
-            asyncResult = (AsyncRpcResult) doInvoke(invocation);//远程服务调用
+            //远程服务调用
+            asyncResult = (AsyncRpcResult) doInvoke(invocation);
         } catch (InvocationTargetException e) { // biz exception
             Throwable te = e.getTargetException();
             if (te == null) {
@@ -179,7 +180,8 @@ public abstract class AbstractInvoker<T> implements Invoker<T> {
         } catch (Throwable e) {
             asyncResult = AsyncRpcResult.newDefaultAsyncResult(null, e, invocation);
         }
-        RpcContext.getContext().setFuture(new FutureAdapter(asyncResult.getResponseFuture()));//结果获取 1.RpcContext获取Future 2. FutureContext.getContext()
+        //结果获取 1.RpcContext获取Future 2. FutureContext.getContext()
+        RpcContext.getContext().setFuture(new FutureAdapter(asyncResult.getResponseFuture()));
         return asyncResult;
     }
 

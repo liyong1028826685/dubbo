@@ -26,6 +26,20 @@ import org.apache.dubbo.remoting.RemotingException;
 import org.apache.dubbo.remoting.exchange.Request;
 import org.apache.dubbo.remoting.exchange.Response;
 
+/***
+ *@className DecodeHandler
+ *
+ *@description 编码、解码操作公用类
+ *
+ *@author <a href="http://youngitman.tech">青年IT男</a>
+ *
+ *@date 21:38 2020-03-08
+ *
+ *@JunitTest: {@link  }
+ *
+ *@version v1.0.0
+ *
+**/
 public class DecodeHandler extends AbstractChannelHandlerDelegate {
 
     private static final Logger log = LoggerFactory.getLogger(DecodeHandler.class);

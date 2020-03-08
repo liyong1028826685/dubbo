@@ -131,8 +131,11 @@ final class HeaderExchangeChannel implements ExchangeChannel {
         // 设置需要响应
         req.setTwoWay(true);
         req.setData(request);
+        //注册Future和Channel
         DefaultFuture future = DefaultFuture.newFuture(channel, req, timeout, executor);
         try {
+            //发送数据立即返回无阻塞 通过绑定的请求处理器处理结果 ExchangeHandler
+            //org.apache.dubbo.remoting.transport.netty4.NettyClient
             channel.send(req);
         } catch (RemotingException e) {
             future.cancel();

@@ -20,7 +20,20 @@ import org.apache.dubbo.common.logger.Logger;
 import org.apache.dubbo.common.logger.LoggerFactory;
 import org.apache.dubbo.remoting.Channel;
 import org.apache.dubbo.remoting.ChannelHandler;
-
+/***
+ *@className ChannelEventRunnable
+ *
+ *@description 处理通道事件：RECEIVED、CONNECTED、DISCONNECTED、CAUGHT等等并且设置异步执行结果
+ *
+ *@author <a href="http://youngitman.tech">青年IT男</a>
+ *
+ *@date 21:35 2020-03-08
+ *
+ *@JunitTest: {@link  }
+ *
+ *@version v1.0.0
+ *
+**/
 public class ChannelEventRunnable implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(ChannelEventRunnable.class);
 
@@ -52,8 +65,9 @@ public class ChannelEventRunnable implements Runnable {
 
     @Override
     public void run() {
+        //接受数据事件
         if (state == ChannelState.RECEIVED) {
-            try {
+            try {//DecodeHandler->HeaderExchangeHandler（对应Response结果不会执行DubboProtocol）
                 handler.received(channel, message);
             } catch (Exception e) {
                 logger.warn("ChannelEventRunnable handle " + state + " operation error, channel is " + channel
@@ -61,13 +75,15 @@ public class ChannelEventRunnable implements Runnable {
             }
         } else {
             switch (state) {
+                //连接事件
             case CONNECTED:
-                try {
+                try {//DecodeHandler->HeaderExchangeHandler->DubboProtocol
                     handler.connected(channel);
                 } catch (Exception e) {
                     logger.warn("ChannelEventRunnable handle " + state + " operation error, channel is " + channel, e);
                 }
                 break;
+                //连接断开
             case DISCONNECTED:
                 try {
                     handler.disconnected(channel);
@@ -75,6 +91,7 @@ public class ChannelEventRunnable implements Runnable {
                     logger.warn("ChannelEventRunnable handle " + state + " operation error, channel is " + channel, e);
                 }
                 break;
+                //数据已经发送
             case SENT:
                 try {
                     handler.sent(channel, message);
@@ -83,6 +100,7 @@ public class ChannelEventRunnable implements Runnable {
                             + ", message is " + message, e);
                 }
                 break;
+                //发生异常
             case CAUGHT:
                 try {
                     handler.caught(channel, exception);

@@ -169,9 +169,11 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
 
     public void subscribe(URL url) {
         setConsumerUrl(url);
-        CONSUMER_CONFIGURATION_LISTENER.addNotifyListener(this);//注册监听器
+        //注册监听器
+        CONSUMER_CONFIGURATION_LISTENER.addNotifyListener(this);
         serviceConfigurationListener = new ReferenceConfigurationListener(this, url);
-        registry.subscribe(url, this);//ListenerRegistryWrapper
+        //ListenerRegistryWrapper
+        registry.subscribe(url, this);
     }
 
 
@@ -206,7 +208,7 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
             logger.warn("Failed to destroy service " + serviceKey, t);
         }
     }
-
+    //注册中心服务信息通知
     @Override
     public synchronized void notify(List<URL> urls) {
         Map<String, List<URL>> categoryUrls = urls.stream()
@@ -376,6 +378,7 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
     }
 
     /**
+     * URL转换为Invoker
      * Turn urls into invokers, and if url has been refer, will not re-reference.
      *
      * @param urls
@@ -432,7 +435,7 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
                         enabled = url.getParameter(ENABLED_KEY, true);
                     }
                     if (enabled) {
-                        //protocol：ProtocolFilterWrapper(包装Filter链)->ProtocolListenerWrapper->DubboProtocol
+                        //protocol：ProtocolFilterWrapper(包装Filter链)->ProtocolListenerWrapper->AbstractProtocol->DubboProtocol
                         //Invoker包装：InvokerDelegate->Invoker(ProtocolFilterWrapper包装Filter链)->ListenerInvokerWrapper->AsyncToSyncInvoker->DubboInvoker
                         invoker = new InvokerDelegate<>(protocol.refer(serviceType, url), url, providerUrl);
                     }

@@ -40,11 +40,12 @@ import static org.apache.dubbo.remoting.Constants.TICKS_PER_WHEEL;
 import static org.apache.dubbo.remoting.utils.UrlUtils.getHeartbeat;
 import static org.apache.dubbo.remoting.utils.UrlUtils.getIdleTimeout;
 
-/**消费者默认客户端
+/**消费者默认客户端 支持心跳+重连接
  * DefaultMessageClient
  */
 public class HeaderExchangeClient implements ExchangeClient {
 
+    //netty4封装
     private final Client client;
     private final ExchangeChannel channel;
 
@@ -92,6 +93,7 @@ public class HeaderExchangeClient implements ExchangeClient {
 
     @Override
     public CompletableFuture<Object> request(Object request, int timeout, ExecutorService executor) throws RemotingException {
+        //HeaderExchangeChannel
         return channel.request(request, timeout, executor);
     }
 

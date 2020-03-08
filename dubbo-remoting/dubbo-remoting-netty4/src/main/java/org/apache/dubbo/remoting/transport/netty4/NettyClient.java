@@ -88,7 +88,7 @@ public class NettyClient extends AbstractClient {
      */
     @Override
     protected void doOpen() throws Throwable {
-        final NettyClientHandler nettyClientHandler = new NettyClientHandler(getUrl(), this);
+        final NettyClientHandler nettyClientHandler = new NettyClientHandler(getUrl(), this);//Netty底层连接处理
         bootstrap = new Bootstrap();
         bootstrap.group(nioEventLoopGroup)
                 .option(ChannelOption.SO_KEEPALIVE, true)
@@ -107,7 +107,7 @@ public class NettyClient extends AbstractClient {
                 if (getUrl().getParameter(SSL_ENABLED_KEY, false)) {
                     ch.pipeline().addLast("negotiation", SslHandlerInitializer.sslClientHandler(getUrl(), nettyClientHandler));
                 }
-
+                //Codec适配器
                 NettyCodecAdapter adapter = new NettyCodecAdapter(getCodec(), getUrl(), NettyClient.this);
                 ch.pipeline()//.addLast("logging",new LoggingHandler(LogLevel.INFO))//for debug
                         .addLast("decoder", adapter.getDecoder())
@@ -124,8 +124,8 @@ public class NettyClient extends AbstractClient {
             }
         });
     }
-
-    @Override
+    //获得连接通道
+    @  Override
     protected void doConnect() throws Throwable {
         long start = System.currentTimeMillis();
         ChannelFuture future = bootstrap.connect(getConnectAddress());

@@ -32,7 +32,7 @@ import io.netty.handler.timeout.IdleStateEvent;
 
 import static org.apache.dubbo.common.constants.CommonConstants.HEARTBEAT_EVENT;
 
-/**
+/**底层Netty通信处理器
  * NettyClientHandler
  */
 @io.netty.channel.ChannelHandler.Sharable
@@ -57,7 +57,7 @@ public class NettyClientHandler extends ChannelDuplexHandler {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         NettyChannel channel = NettyChannel.getOrAddChannel(ctx.channel(), url, handler);
-        handler.connected(channel);
+        handler.connected(channel);//NettyClient->MultiMessageHandler->HeartbeatHandler->AllChannelHandler->DecodeHandler->HeaderExchangeHandler->DubboProtocol
         if (logger.isInfoEnabled()) {
             logger.info("The connection of " + channel.getLocalAddress() + " -> " + channel.getRemoteAddress() + " is established.");
         }

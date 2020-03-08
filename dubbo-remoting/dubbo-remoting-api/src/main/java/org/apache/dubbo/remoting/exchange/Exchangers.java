@@ -27,6 +27,7 @@ import org.apache.dubbo.remoting.exchange.support.Replier;
 import org.apache.dubbo.remoting.transport.ChannelHandlerAdapter;
 
 /**
+ * Exchanger操作工具类
  * Exchanger facade. (API, Static, ThreadSafe)
  */
 public class Exchangers {

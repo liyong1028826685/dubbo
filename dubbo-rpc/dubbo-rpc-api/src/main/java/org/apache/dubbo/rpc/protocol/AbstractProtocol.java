@@ -99,6 +99,17 @@ public abstract class AbstractProtocol implements Protocol {
         }
     }
 
+    /***
+     *
+     * 构建异步转同步调用封装DubboInvoker
+     *
+     * @author liyong
+     * @date 16:10 2020-03-08
+     * @param type
+ * @param url
+     * @exception
+     * @return org.apache.dubbo.rpc.Invoker<T>
+     **/
     @Override
     public <T> Invoker<T> refer(Class<T> type, URL url) throws RpcException {
         return new AsyncToSyncInvoker<>(protocolBindingRefer(type, url));

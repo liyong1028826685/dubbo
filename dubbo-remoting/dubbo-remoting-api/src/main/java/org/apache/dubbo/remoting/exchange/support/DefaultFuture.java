@@ -42,14 +42,19 @@ import static org.apache.dubbo.common.constants.CommonConstants.DEFAULT_TIMEOUT;
 import static org.apache.dubbo.common.constants.CommonConstants.TIMEOUT_KEY;
 
 /**
+ *
+ * 所有Channel、future绑定和移除
+ *
  * DefaultFuture.
  */
 public class DefaultFuture extends CompletableFuture<Object> {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultFuture.class);
 
+    //注册所有Channel
     private static final Map<Long, Channel> CHANNELS = new ConcurrentHashMap<>();
 
+    //注册所有future
     private static final Map<Long, DefaultFuture> FUTURES = new ConcurrentHashMap<>();
 
     public static final Timer TIME_OUT_TIMER = new HashedWheelTimer(
@@ -64,8 +69,9 @@ public class DefaultFuture extends CompletableFuture<Object> {
     private final int timeout;
     private final long start = System.currentTimeMillis();
     private volatile long sent;
+    //超时检测task
     private Timeout timeoutCheckTask;
-
+    //自定义执行器
     private ExecutorService executor;
 
     public ExecutorService getExecutor() {
@@ -87,6 +93,7 @@ public class DefaultFuture extends CompletableFuture<Object> {
     }
 
     /**
+     * 每一个DefaultFuture都有一个超时检测任务
      * check time out of the future
      */
     private static void timeoutCheck(DefaultFuture future) {
@@ -163,6 +170,18 @@ public class DefaultFuture extends CompletableFuture<Object> {
         received(channel, response, false);
     }
 
+    /***
+     *
+     * 接受到通道数据处理，异步结果
+     *
+     * @author liyong
+     * @date 21:41 2020-03-08
+     * @param channel
+ * @param response
+ * @param timeout
+     * @exception
+     * @return void
+     **/
     public static void received(Channel channel, Response response, boolean timeout) {
         try {
             DefaultFuture future = FUTURES.remove(response.getId());
@@ -172,6 +191,7 @@ public class DefaultFuture extends CompletableFuture<Object> {
                     // decrease Time
                     t.cancel();
                 }
+                //通道关闭并且设置返回值
                 future.doReceived(response);
             } else {
                 logger.warn("The timeout response finally returned at "
@@ -181,6 +201,7 @@ public class DefaultFuture extends CompletableFuture<Object> {
                         + " -> " + channel.getRemoteAddress()));
             }
         } finally {
+            //删除channel
             CHANNELS.remove(response.getId());
         }
     }

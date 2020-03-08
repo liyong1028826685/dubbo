@@ -189,6 +189,7 @@ public class AsyncRpcResult implements Result {
 
     public Result whenCompleteWithContext(BiConsumer<Result, Throwable> fn) {
         this.responseFuture = this.responseFuture.whenComplete((v, t) -> {
+            //这个上下文如何避免相同的线程用于执行另一个RPC调用导致原来的RpcContext可能已经被更改的情况
             beforeContext.accept(v, t);
             fn.accept(v, t);
             afterContext.accept(v, t);

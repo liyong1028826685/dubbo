@@ -289,7 +289,7 @@ public abstract class FailbackRegistry extends AbstractRegistry {
             addFailedUnregistered(url);
         }
     }
-
+    //监听器注册
     @Override
     public void subscribe(URL url, NotifyListener listener) {
         super.subscribe(url, listener);

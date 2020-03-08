@@ -325,7 +325,7 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
             }
             //Protocol==registry -> ProtocolListenerWrapper->ProtocolFilterWrapper->RegistryProtocol
             if (urls.size() == 1) {
-                //InvokerInvocationHandler->MockClusterInvoker->AbstractCluster.InterceptorInvokerNode->ConsumerContextClusterInterceptor->FailoverClusterInvoker
+                //MockClusterInvoker->AbstractCluster.InterceptorInvokerNode->ConsumerContextClusterInterceptor->FailoverClusterInvoker
                 invoker = REF_PROTOCOL.refer(interfaceClass, urls.get(0));
             } else {
                 List<Invoker<?>> invokers = new ArrayList<Invoker<?>>();

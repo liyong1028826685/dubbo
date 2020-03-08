@@ -87,7 +87,7 @@ import static org.apache.dubbo.rpc.protocol.dubbo.Constants.OPTIMIZER_KEY;
 import static org.apache.dubbo.rpc.protocol.dubbo.Constants.SHARE_CONNECTIONS_KEY;
 
 
-/**
+/**服务端和客户端公用
  * dubbo protocol support.
  */
 public class DubboProtocol extends AbstractProtocol {
@@ -110,6 +110,7 @@ public class DubboProtocol extends AbstractProtocol {
      */
     private final ConcurrentMap<String, String> stubServiceMethodsMap = new ConcurrentHashMap<>();
 
+    //请求处理器
     private ExchangeHandler requestHandler = new ExchangeHandlerAdapter() {
 
         @Override
@@ -399,17 +400,37 @@ public class DubboProtocol extends AbstractProtocol {
         }
     }
 
+    /***
+     *
+     * 协议绑定并创建连接
+     *
+     * @author liyong
+     * @date 16:11 2020-03-08
+     * @param serviceType
+ * @param url
+     * @exception
+     * @return org.apache.dubbo.rpc.Invoker<T>
+     **/
     @Override
     public <T> Invoker<T> protocolBindingRefer(Class<T> serviceType, URL url) throws RpcException {
         optimizeSerialization(url);
 
-        // create rpc invoker.
+        // create rpc invoker. 创建DubboInvoker并且创建网络连接
         DubboInvoker<T> invoker = new DubboInvoker<T>(serviceType, url, getClients(url), invokers);
         invokers.add(invoker);
 
         return invoker;
     }
-
+    /***
+     *
+     * 获取客户端连接,并且绑定了请求处理器
+     *
+     * @author liyong
+     * @date 16:55 2020-03-08
+     * @param url
+     * @exception
+     * @return org.apache.dubbo.remoting.exchange.ExchangeClient[]
+     **/
     private ExchangeClient[] getClients(URL url) {
         // whether to share connection
 
@@ -566,6 +587,7 @@ public class DubboProtocol extends AbstractProtocol {
     }
 
     /**
+     * 创建连接并且绑定处理器
      * Create new connection
      *
      * @param url
@@ -592,7 +614,8 @@ public class DubboProtocol extends AbstractProtocol {
                 client = new LazyConnectExchangeClient(url, requestHandler);
 
             } else {
-                client = Exchangers.connect(url, requestHandler);//HeaderExchangeClient 连接到服务器
+                //HeaderExchangeClient连接到服务器并绑定请求处理器
+                client = Exchangers.connect(url, requestHandler);
             }
 
         } catch (RemotingException e) {

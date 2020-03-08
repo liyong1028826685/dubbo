@@ -26,6 +26,7 @@ import org.apache.dubbo.remoting.exchange.Exchanger;
 import org.apache.dubbo.remoting.transport.DecodeHandler;
 
 /**
+ * 服务端、客户端数据交换包装类
  * DefaultMessenger
  *
  *

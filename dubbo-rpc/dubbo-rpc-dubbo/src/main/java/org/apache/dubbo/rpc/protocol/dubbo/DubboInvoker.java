@@ -83,6 +83,7 @@ public class DubboInvoker<T> extends AbstractInvoker<T> {
 
         ExchangeClient currentClient;
         if (clients.length == 1) {
+            //ReferenceCountExchangeClient
             currentClient = clients[0];
         } else {
             currentClient = clients[index.getAndIncrement() % clients.length];
@@ -92,12 +93,18 @@ public class DubboInvoker<T> extends AbstractInvoker<T> {
             int timeout = getUrl().getMethodPositiveParameter(methodName, TIMEOUT_KEY, DEFAULT_TIMEOUT);
             if (isOneway) {
                 boolean isSent = getUrl().getMethodParameter(methodName, Constants.SENT_KEY, false);
+                //HeaderExchangeClient
                 currentClient.send(inv, isSent);
+                //无返回值
                 return AsyncRpcResult.newDefaultAsyncResult(invocation);
-            } else {//支持线程池，异步模式
+            } else {
+                //支持线程池，异步模式
                 ExecutorService executor = getCallbackExecutor(getUrl(), inv);
-                CompletableFuture<AppResponse> appResponseFuture =
-                        currentClient.request(inv, timeout, executor).thenApply(obj -> (AppResponse) obj);
+
+                //ReferenceCountExchangeClient->HeaderExchangeClient->HeaderExchangeChannel->org.apache.dubbo.remoting.transport.netty4.NettyClient
+                //currentClient == HeaderExchangeClient
+                CompletableFuture<AppResponse> appResponseFuture = currentClient.request(inv, timeout, executor).thenApply(obj -> (AppResponse) obj);
+
                 // save for 2.6.x compatibility, for example, TraceFilter in Zipkin uses com.alibaba.xxx.FutureAdapter
                 FutureContext.getContext().setCompatibleFuture(appResponseFuture);
                 AsyncRpcResult result = new AsyncRpcResult(appResponseFuture, inv);

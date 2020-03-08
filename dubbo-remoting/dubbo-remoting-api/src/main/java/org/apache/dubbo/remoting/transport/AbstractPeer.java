@@ -29,6 +29,7 @@ import org.apache.dubbo.remoting.RemotingException;
  */
 public abstract class AbstractPeer implements Endpoint, ChannelHandler {
 
+    //处理器
     private final ChannelHandler handler;
 
     private volatile URL url;
@@ -144,7 +145,7 @@ public abstract class AbstractPeer implements Endpoint, ChannelHandler {
     public void received(Channel ch, Object msg) throws RemotingException {
         if (closed) {
             return;
-        }
+        }//MultiMessageHandler->HeartbeatHandler->AllChannelHandler->DecodeHandler->HeaderExchangeHandler->DubboProtocol
         handler.received(ch, msg);
     }
 
