@@ -33,6 +33,9 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 
 /**
+ *
+ * Dubbo服务暴露包装bean
+ *
  * ServiceFactoryBean
  *
  * @export

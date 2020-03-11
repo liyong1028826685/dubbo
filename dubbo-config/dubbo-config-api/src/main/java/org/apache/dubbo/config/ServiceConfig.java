@@ -294,6 +294,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
     @SuppressWarnings({"unchecked", "rawtypes"})
     private void doExportUrls() {
         ServiceRepository repository = ApplicationModel.getServiceRepository();
+        //注册services
         ServiceDescriptor serviceDescriptor = repository.registerService(getInterfaceClass());
         //服务端本地注册provider
         repository.registerProvider(
@@ -304,6 +305,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
                 serviceMetadata
         );
 
+        //获取注册中心地址
         List<URL> registryURLs = ConfigValidationUtils.loadRegistries(this, true);
 
         //多协议注册
@@ -319,6 +321,17 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
         }
     }
 
+    /***
+     *
+     * 注册服务到注册中心
+     *
+     * @author liyong
+     * @date 23:21 2020-03-09
+     * @param protocolConfig
+ * @param registryURLs
+     * @exception
+     * @return void
+     **/
     private void doExportUrlsFor1Protocol(ProtocolConfig protocolConfig, List<URL> registryURLs) {
         String name = protocolConfig.getName();
         if (StringUtils.isEmpty(name)) {
@@ -443,6 +456,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
             }
             // export to remote if the config is not local (export to local only when config is local)
             if (!SCOPE_LOCAL.equalsIgnoreCase(scope)) {
+                registryURLs=null;
                 if (CollectionUtils.isNotEmpty(registryURLs)) {
                     for (URL registryURL : registryURLs) {
                         //if protocol is only injvm ,not register
@@ -468,7 +482,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
                             registryURL = registryURL.addParameter(PROXY_KEY, proxy);
                         }
                         //StubProxyFactoryWrapper->JavassistProxyFactory
-                        //返回AbstractProxyInvoker匿名内部类实例
+                        //返回AbstractProxyInvoker->Wrapper->ref匿名内部类实例
                         Invoker<?> invoker = PROXY_FACTORY.getInvoker(ref, (Class) interfaceClass, registryURL.addParameterAndEncoded(EXPORT_KEY, url.toFullString()));
 
                         //invoker包装路径DelegateProviderMetaDataInvoker->AbstractProxyInvoker->Wrapper->ref
@@ -514,6 +528,8 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
                 .setHost(LOCALHOST_VALUE)
                 .setPort(0)
                 .build();
+        //ProtocolListenerWrapper->ProtocolFilterWrapper->InjvmProtocol
+        //Invoker:StubProxyFactoryWrapper->JavassistProxyFactory->AbstractProxyInvoker->Wrapper->ref
         Exporter<?> exporter = protocol.export(
                 PROXY_FACTORY.getInvoker(ref, (Class) interfaceClass, local));
         exporters.add(exporter);
