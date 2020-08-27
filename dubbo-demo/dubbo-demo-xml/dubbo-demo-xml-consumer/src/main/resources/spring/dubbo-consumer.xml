@@ -28,7 +28,7 @@
 
     <dubbo:consumer /><!--tag="tag2"-->
 
-<!--    <dubbo:registry address="zookeeper://127.0.0.1:2181"/>-->
+    <dubbo:registry address="zookeeper://127.0.0.1:2181"/>
 
     <!--check="false" 消费端启动时不检查引用服务是否准备好-->
     <!--直连绕开注册中心
@@ -39,7 +39,7 @@
 
     <bean id ="demoCallback" class = "org.apache.dubbo.demo.consumer.NotifyImpl" />
 
-    <dubbo:reference id="demoService2" check="false" interface="org.apache.dubbo.demo.DemoService" group="demo2" mock="force" >
+    <dubbo:reference id="demoService2" check="false" init="true"  interface="org.apache.dubbo.demo.DemoService" group="demo2" mock="force" >
 <!--        <dubbo:method name="sayHello"  cache="lru"/>-->
         <dubbo:method name="sayHello"  async="true" return="true" onreturn="demoCallback.onreturn" onthrow="demoCallback.onthrow"/>
     </dubbo:reference>

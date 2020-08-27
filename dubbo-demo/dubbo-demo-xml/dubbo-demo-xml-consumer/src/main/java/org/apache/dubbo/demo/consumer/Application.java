@@ -41,9 +41,9 @@ public class Application {
 //            TimeUnit.SECONDS.sleep(1);
 //        }
 
-        for(int i=0;i<10;i++){
-            checkParameters();
-        }
+//        for(int i=0;i<10;i++){
+//            checkParameters();
+//        }
 
 
 //        mock();
@@ -54,7 +54,7 @@ public class Application {
 
 //        async();
 
-//        sync();
+        sync();
 
         //System.in.read();
     }

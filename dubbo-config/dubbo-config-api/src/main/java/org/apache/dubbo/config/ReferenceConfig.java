@@ -143,6 +143,16 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
         super(reference);
     }
 
+    /**
+     *
+     * 获取引用代理对象
+     *
+     * @author liyong
+     * @date 5:46 PM 2020/8/26
+     * @param
+     * @exception
+     * @return T
+     **/
     public synchronized T get() {
         if (destroyed) {
             throw new IllegalStateException("The invoker of ReferenceConfig(" + url + ") has already destroyed!");
@@ -173,6 +183,16 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
         dispatch(new ReferenceConfigDestroyedEvent(this));
     }
 
+    /**
+     *
+     * 远程代理对象引用
+     *
+     * @author liyong
+     * @date 5:56 PM 2020/8/26
+     * @param
+     * @exception
+     * @return void
+     **/
     public synchronized void init() {
         if (initialized) {
             return;
@@ -203,6 +223,7 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
         map.put(SIDE_KEY, CONSUMER_SIDE);
 
         ReferenceConfigBase.appendRuntimeParameters(map);
+        //是否使用泛型接口
         if (!ProtocolUtils.isGeneric(generic)) {
             //获取版本号
             String revision = Version.getVersion(interfaceClass, version);
@@ -247,6 +268,7 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
             }
         }
 
+        //消费端ip
         String hostToRegistry = ConfigUtils.getSystemProperty(DUBBO_IP_TO_REGISTRY);
         if (StringUtils.isEmpty(hostToRegistry)) {
             hostToRegistry = NetUtils.getLocalHost();
@@ -267,8 +289,10 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
                 null,
                 serviceMetadata);
 
+        //创建远程代理对象
         ref = createProxy(map);
 
+        //设置代理对象
         serviceMetadata.setTarget(ref);
         serviceMetadata.addAttribute(PROXY_CLASS_REF, ref);
         repository.lookupReferredService(serviceMetadata.getServiceKey()).setProxyObject(ref);
@@ -281,6 +305,7 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
 
     @SuppressWarnings({"unchecked", "rawtypes", "deprecation"})
     private T createProxy(Map<String, String> map) {
+        //调用同jvm服务
         if (shouldJvmRefer(map)) {
             URL url = new URL(LOCAL_PROTOCOL, LOCALHOST_VALUE, 0, interfaceClass.getName()).addParameters(map);
             invoker = REF_PROTOCOL.refer(interfaceClass, url);

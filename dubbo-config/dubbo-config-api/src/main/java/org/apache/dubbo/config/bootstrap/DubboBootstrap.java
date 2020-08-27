@@ -945,6 +945,16 @@ public class DubboBootstrap extends GenericEventListener {
         exportedServices.clear();
     }
 
+    /**
+     *
+     * 初始化远程调用代理对象
+     *
+     * @author liyong
+     * @date 5:48 PM 2020/8/26
+     * @param
+     * @exception
+     * @return void
+     **/
     private void referServices() {
         if (cache == null) {
             cache = ReferenceConfigCache.getCache();
@@ -955,7 +965,9 @@ public class DubboBootstrap extends GenericEventListener {
             ReferenceConfig referenceConfig = (ReferenceConfig) rc;
             referenceConfig.setBootstrap(this);
 
+            //是否立即初始化远程调用代理对象
             if (rc.shouldInit()) {
+                //是否同步初始化远程调用代理对象
                 if (referAsync) {
                     CompletableFuture<Object> future = ScheduledCompletableFuture.submit(
                             executorRepository.getServiceExporterExecutor(),
