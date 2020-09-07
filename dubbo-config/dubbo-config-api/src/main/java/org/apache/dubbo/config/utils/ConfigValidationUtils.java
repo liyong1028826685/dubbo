@@ -173,7 +173,7 @@ public class ConfigValidationUtils {
      * @author liyong
      * @date 16:42 2020-03-01
      * @param interfaceConfig
- * @param provider
+     * @param provider
      * @exception
      * @return java.util.List<org.apache.dubbo.common.URL>
      **/

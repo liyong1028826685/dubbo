@@ -89,6 +89,7 @@ public class StubProxyFactoryWrapper implements ProxyFactory {
                     }
                     try {
                         Constructor<?> constructor = ReflectUtils.findConstructor(stubClass, serviceType);
+                        //包装远程代理对象，在调用前先执行本地逻辑(*Stub、*Local)
                         proxy = (T) constructor.newInstance(new Object[]{proxy});
                         //export stub service
                         URLBuilder urlBuilder = URLBuilder.from(url);

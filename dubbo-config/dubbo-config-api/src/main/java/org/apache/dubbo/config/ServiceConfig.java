@@ -456,7 +456,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
             }
             // export to remote if the config is not local (export to local only when config is local)
             if (!SCOPE_LOCAL.equalsIgnoreCase(scope)) {
-                registryURLs=null;
+               // registryURLs=null;
                 if (CollectionUtils.isNotEmpty(registryURLs)) {
                     for (URL registryURL : registryURLs) {
                         //if protocol is only injvm ,not register

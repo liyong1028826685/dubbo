@@ -314,6 +314,7 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
             }
         } else {
             urls.clear();
+            //直连逻辑：获取P2P的URL
             if (url != null && url.length() > 0) { // user specified URL, could be peer-to-peer address, or register center's address.直连
                 String[] us = SEMICOLON_SPLIT_PATTERN.split(url);
                 if (us != null && us.length > 0) {
@@ -348,7 +349,7 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
                     }
                 }
             }
-            //Protocol==registry -> ProtocolListenerWrapper->ProtocolFilterWrapper->RegistryProtocol
+            //Protocol==registry ->ProtocolFilterWrapper-> ProtocolListenerWrapper->RegistryProtocol
             if (urls.size() == 1) {
                 //MockClusterInvoker->AbstractCluster.InterceptorInvokerNode->ConsumerContextClusterInterceptor->FailoverClusterInvoker
                 invoker = REF_PROTOCOL.refer(interfaceClass, urls.get(0));

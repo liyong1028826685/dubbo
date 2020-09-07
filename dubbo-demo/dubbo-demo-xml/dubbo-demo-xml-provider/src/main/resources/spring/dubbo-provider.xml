@@ -28,7 +28,7 @@
     register="false"  禁止注册到注册中心
     subscribe="false" 禁止订阅注册中心
     -->
-    <dubbo:registry address="zookeeper://127.0.0.1:2181" />
+    <dubbo:registry address="zookeeper://127.0.0.1:2181"/>
 
     <!-- 缺省值设置，当<dubbo:service>没有配置validation属性时，使用此配置 -->
     <dubbo:provider validation="custom"  />
@@ -43,8 +43,8 @@
 
     <!--这里使用 cluster="forking"并且获取配置需要注意超时时间如果在超时时间还未获取到结果返回null-->
 
-    <dubbo:service interface="org.apache.dubbo.demo.DemoService" ref="demoService" group="demo1"  stub="true"/>
-    <dubbo:service interface="org.apache.dubbo.demo.DemoService" ref="demoService2" group="demo2" stub="true"/>
+    <dubbo:service interface="org.apache.dubbo.demo.DemoService" ref="demoService" group="demo1"  />
+    <dubbo:service interface="org.apache.dubbo.demo.DemoService" ref="demoService2" group="demo2" />
     <!--开启jsr303参数校验-->
     <dubbo:service interface="org.apache.dubbo.demo.ValidationService" ref="validationService" validation="custom" >
     </dubbo:service>

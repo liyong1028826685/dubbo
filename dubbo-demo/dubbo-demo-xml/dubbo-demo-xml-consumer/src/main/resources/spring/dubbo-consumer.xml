@@ -44,7 +44,7 @@
         <dubbo:method name="sayHello"  async="true" return="true" onreturn="demoCallback.onreturn" onthrow="demoCallback.onthrow"/>
     </dubbo:reference>
 
-    <dubbo:reference id="demoService" check="false" interface="org.apache.dubbo.demo.DemoService" group="demo1,demo2" merger="true"  >
+    <dubbo:reference id="demoService" check="false" interface="org.apache.dubbo.demo.DemoService" group="demo1" merger="true"  >
 <!-- 如果定义多个merger 不指定merger默认使用第一个加载的，  对方法特殊自定    <dubbo:method  name="sayHello" merger="demoMerger2"/>-->
         <dubbo:method name="sayHello"  cache="lru"/>
     </dubbo:reference>
