@@ -45,39 +45,40 @@ public class RandomLoadBalance extends AbstractLoadBalance {
      */
     @Override
     protected <T> Invoker<T> doSelect(List<Invoker<T>> invokers, URL url, Invocation invocation) {
-        // Number of invokers
+        // 服务总数
         int length = invokers.size();
-        // Every invoker has the same weight?
+        // 标识这些服务是否具有相同的权重
         boolean sameWeight = true;
-        // the weight of every invokers
+        // 所有服务权重集合
         int[] weights = new int[length];
-        // the first invoker's weight
+        // 第一个服务权重
         int firstWeight = getWeight(invokers.get(0), invocation);
         weights[0] = firstWeight;
-        // The sum of weights
+        // 权重总和
         int totalWeight = firstWeight;
         for (int i = 1; i < length; i++) {
             int weight = getWeight(invokers.get(i), invocation);
-            // save for later use
+            // 记录权重
             weights[i] = weight;
-            // Sum
+            // 合计权重值
             totalWeight += weight;
             if (sameWeight && weight != firstWeight) {
                 sameWeight = false;
             }
         }
         if (totalWeight > 0 && !sameWeight) {
-            // If (not every invoker has the same weight & at least one invoker's weight>0), select randomly based on totalWeight.
+            // 从（0,totalWeight]范围选择权重值
             int offset = ThreadLocalRandom.current().nextInt(totalWeight);
-            // Return a invoker based on the random value.
+            // 基于随机值返回服务
             for (int i = 0; i < length; i++) {
+                // offset = offset - weights[i]
                 offset -= weights[i];
                 if (offset < 0) {
                     return invokers.get(i);
                 }
             }
         }
-        // If all invokers have the same weight value or totalWeight=0, return evenly.
+        // 如果所有权重值相同或者totalWeight=0返回服务列表中随机一个服务
         return invokers.get(ThreadLocalRandom.current().nextInt(length));
     }
 
