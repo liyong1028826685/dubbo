@@ -48,7 +48,7 @@ public class LeastActiveLoadBalance extends AbstractLoadBalance {
         int firstWeight = 0;
         boolean sameWeight = true;
 
-        // 过滤出所有最少活跃服务
+        // 过滤出所有最少活跃服务,并统计最少活跃服务权重值
         for (int i = 0; i < length; i++) {
             Invoker<T> invoker = invokers.get(i);
             // 获取这个invoker活跃数
