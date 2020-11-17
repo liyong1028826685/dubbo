@@ -260,6 +260,7 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
                         map.put(methodConfig.getName() + ".retries", "0");
                     }
                 }
+                //事件通知配置解析
                 ConsumerModel.AsyncMethodInfo asyncMethodInfo = AbstractConfig.convertMethodConfig2AsyncInfo(methodConfig);
                 if (asyncMethodInfo != null) {
 //                    consumerModel.getMethodModel(methodConfig.getName()).addAttribute(ASYNC_KEY, asyncMethodInfo);
@@ -398,7 +399,7 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
             URL consumerURL = new URL(CONSUMER_PROTOCOL, map.remove(REGISTER_IP_KEY), 0, map.get(INTERFACE_KEY), map);
             metadataService.publishServiceDefinition(consumerURL);
         }
-        // create service proxy  InvokerInvocationHandler->MockClusterInvoker->AbstractCluster.InterceptorInvokerNode->ConsumerContextClusterInterceptor->FailoverClusterInvoker
+        // create service proxy InvokerInvocationHandler->MockClusterInvoker->AbstractCluster.InterceptorInvokerNode->ConsumerContextClusterInterceptor->FailoverClusterInvoker
         return (T) PROXY_FACTORY.getProxy(invoker);//StubProxyFactoryWrapper->JavassistProxyFactory
     }
 

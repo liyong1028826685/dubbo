@@ -91,13 +91,27 @@ public class FutureFilter implements Filter, Filter.Listener {
         }
     }
 
+    /**
+     *
+     * 触发正常回调
+     *
+     * @author liyong
+     * @date 3:43 PM 2020/11/15
+     * @param invoker
+     * @param invocation
+     * @param result
+     * @exception
+     * @return void
+     **/
     private void fireReturnCallback(final Invoker<?> invoker, final Invocation invocation, final Object result) {
         final ConsumerModel.AsyncMethodInfo asyncMethodInfo = getAsyncMethodInfo(invoker, invocation);
         if (asyncMethodInfo == null) {
             return;
         }
 
+        //获取配置的throwMethod方法
         final Method onReturnMethod = asyncMethodInfo.getOnreturnMethod();
+        //获取throwMethod方法实例
         final Object onReturnInst = asyncMethodInfo.getOnreturnInstance();
 
         //not set onreturn callback
@@ -116,19 +130,25 @@ public class FutureFilter implements Filter, Filter.Listener {
         Object[] params;
         Class<?>[] rParaTypes = onReturnMethod.getParameterTypes();
         if (rParaTypes.length > 1) {
+            //调用方法参数个数为2 且第一个为数组类型
             if (rParaTypes.length == 2 && rParaTypes[1].isAssignableFrom(Object[].class)) {
                 params = new Object[2];
+                //数组第0个为原方法返回值
                 params[0] = result;
+                //第1个为原方法参数
                 params[1] = args;
             } else {
                 params = new Object[args.length + 1];
                 params[0] = result;
+                //使用数组拷贝
                 System.arraycopy(args, 0, params, 1, args.length);
             }
         } else {
+            //只有一个参数类型
             params = new Object[]{result};
         }
         try {
+            //触发onreturn回调方法
             onReturnMethod.invoke(onReturnInst, params);
         } catch (InvocationTargetException e) {
             fireThrowCallback(invoker, invocation, e.getTargetException());
@@ -137,13 +157,27 @@ public class FutureFilter implements Filter, Filter.Listener {
         }
     }
 
+    /**
+     *
+     * 触发异常回调
+     *
+     * @author liyong
+     * @date 3:40 PM 2020/11/15
+     * @param invoker
+     * @param invocation
+     * @param exception
+     * @exception
+     * @return void
+     **/
     private void fireThrowCallback(final Invoker<?> invoker, final Invocation invocation, final Throwable exception) {
         final ConsumerModel.AsyncMethodInfo asyncMethodInfo = getAsyncMethodInfo(invoker, invocation);
         if (asyncMethodInfo == null) {
             return;
         }
 
+        //获取配置的throwMethod方法
         final Method onthrowMethod = asyncMethodInfo.getOnthrowMethod();
+        //获取throwMethod方法实例
         final Object onthrowInst = asyncMethodInfo.getOnthrowInstance();
 
         //onthrow callback not configured
@@ -156,25 +190,32 @@ public class FutureFilter implements Filter, Filter.Listener {
         if (!onthrowMethod.isAccessible()) {
             onthrowMethod.setAccessible(true);
         }
+        //获取throwMethod方法参数类型
         Class<?>[] rParaTypes = onthrowMethod.getParameterTypes();
+        //throwMethod方法第一个参数配置为Throwable以及子类
         if (rParaTypes[0].isAssignableFrom(exception.getClass())) {
             try {
                 Object[] args = invocation.getArguments();
                 Object[] params;
 
                 if (rParaTypes.length > 1) {
+                    //throwMethod方法存在2个参数且第二个参数是数组类型
                     if (rParaTypes.length == 2 && rParaTypes[1].isAssignableFrom(Object[].class)) {
                         params = new Object[2];
                         params[0] = exception;
+                        //第二个参数填充数组
                         params[1] = args;
                     } else {
                         params = new Object[args.length + 1];
                         params[0] = exception;
+                        //使用数组拷贝
                         System.arraycopy(args, 0, params, 1, args.length);
                     }
                 } else {
+                    //不存在参数只填充异常
                     params = new Object[]{exception};
                 }
+                //执行配置throwMethod方法调用
                 onthrowMethod.invoke(onthrowInst, params);
             } catch (Throwable e) {
                 logger.error(invocation.getMethodName() + ".call back method invoke error . callback method :" + onthrowMethod + ", url:" + invoker.getUrl(), e);

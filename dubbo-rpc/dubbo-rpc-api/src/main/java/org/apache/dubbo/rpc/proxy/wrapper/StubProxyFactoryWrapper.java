@@ -72,10 +72,12 @@ public class StubProxyFactoryWrapper implements ProxyFactory {
         T proxy = proxyFactory.getProxy(invoker);
         if (GenericService.class != invoker.getInterface()) {
             URL url = invoker.getUrl();
+            //获取本地存根配置
             String stub = url.getParameter(STUB_KEY, url.getParameter(LOCAL_KEY));
             if (ConfigUtils.isNotEmpty(stub)) {
                 Class<?> serviceType = invoker.getInterface();
                 if (ConfigUtils.isDefault(stub)) {
+                    //尝试获取stub如果未查找到默认使用XxxLocal
                     if (url.hasParameter(STUB_KEY)) {
                         stub = serviceType.getName() + "Stub";
                     } else {
@@ -83,15 +85,17 @@ public class StubProxyFactoryWrapper implements ProxyFactory {
                     }
                 }
                 try {
+                    //加载XxxStub或XxxLocal
                     Class<?> stubClass = ReflectUtils.forName(stub);
                     if (!serviceType.isAssignableFrom(stubClass)) {
                         throw new IllegalStateException("The stub implementation class " + stubClass.getName() + " not implement interface " + serviceType.getName());
                     }
                     try {
+                        //获取参数签名为接口类型的构造函数
                         Constructor<?> constructor = ReflectUtils.findConstructor(stubClass, serviceType);
                         //包装远程代理对象，在调用前先执行本地逻辑(*Stub、*Local)
                         proxy = (T) constructor.newInstance(new Object[]{proxy});
-                        //export stub service
+                        //暴露包装后的对象
                         URLBuilder urlBuilder = URLBuilder.from(url);
                         if (url.getParameter(STUB_EVENT_KEY, DEFAULT_STUB_EVENT)) {
                             urlBuilder.addParameter(STUB_EVENT_METHODS_KEY, StringUtils.join(Wrapper.getWrapper(proxy.getClass()).getDeclaredMethodNames(), ","));

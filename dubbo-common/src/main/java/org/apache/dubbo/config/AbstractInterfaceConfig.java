@@ -249,13 +249,14 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
     }
 
     private void verify(Class<?> interfaceClass, Class<?> localClass) {
+        //判断该localClass是否为interfaceClass的子类型
         if (!interfaceClass.isAssignableFrom(localClass)) {
             throw new IllegalStateException("The local implementation class " + localClass.getName() +
                     " not implement interface " + interfaceClass.getName());
         }
 
         try {
-            //Check if the localClass a constructor with parameter who's type is interfaceClass
+            //判断localClass构造函数是否以interfaceClass类型的参数签名
             ReflectUtils.findConstructor(localClass, interfaceClass);
         } catch (NoSuchMethodException e) {
             throw new IllegalStateException("No such constructor \"public " + localClass.getSimpleName() +
