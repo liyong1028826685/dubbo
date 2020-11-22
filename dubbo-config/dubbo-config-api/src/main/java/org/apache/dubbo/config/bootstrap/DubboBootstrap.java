@@ -730,12 +730,13 @@ public class DubboBootstrap extends GenericEventListener {
      * Start the bootstrap
      */
     public DubboBootstrap start() {
+        //判断服务是否启动 防止重复暴露服务 注意：这里是原子操作
         if (started.compareAndSet(false, true)) {
             initialize();
             if (logger.isInfoEnabled()) {
                 logger.info(NAME + " is starting...");
             }
-            // 1. export Dubbo Services
+            // 1. 暴露Dubbo服务
             exportServices();
 
             // Not only provider register
@@ -915,15 +916,17 @@ public class DubboBootstrap extends GenericEventListener {
             ServiceConfig serviceConfig = (ServiceConfig) sc;
             serviceConfig.setBootstrap(this);
 
+            //是否异步导出
             if (exportAsync) {
                 //异步导出
                 ExecutorService executor = executorRepository.getServiceExporterExecutor();
                 Future<?> future = executor.submit(() -> {
+                    //服务暴露
                     sc.export();
                 });
                 asyncExportingFutures.add(future);
             } else {
-                //同步导出
+                //同步服务暴露导出
                 sc.export();
                 exportedServices.add(sc);
             }

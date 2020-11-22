@@ -109,6 +109,7 @@ public class ProtocolFilterWrapper implements Protocol {
                             if (filter instanceof ListenableFilter) {// Deprecated!
                                 Filter.Listener listener = ((ListenableFilter) filter).listener();
                                 if (listener != null) {
+                                    //通知监听器
                                     if (t == null) {
                                         listener.onMessage(r, invoker, invocation);
                                     } else {

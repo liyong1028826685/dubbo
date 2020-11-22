@@ -179,6 +179,16 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
         dispatch(new ServiceConfigUnexportedEvent(this));
     }
 
+    /**
+     *
+     * 服务暴露
+     *
+     * @author liyong
+     * @date 10:55 PM 2020/11/18
+     * @param
+     * @exception
+     * @return void
+     **/
     public synchronized void export() {
         if (!shouldExport()) {
             return;
@@ -199,10 +209,12 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
         serviceMetadata.setServiceInterfaceName(getInterface());
         serviceMetadata.setTarget(getRef());
 
+        //是否延迟暴露判断
         if (shouldDelay()) {
             //延迟暴露
             DELAY_EXPORT_EXECUTOR.schedule(this::doExport, getDelay(), TimeUnit.MILLISECONDS);
         } else {
+            //服务暴露
             doExport();
         }
     }

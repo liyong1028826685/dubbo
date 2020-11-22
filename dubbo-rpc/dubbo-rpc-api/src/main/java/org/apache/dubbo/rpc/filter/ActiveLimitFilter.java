@@ -49,22 +49,30 @@ public class ActiveLimitFilter implements Filter, Filter.Listener {
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
         URL url = invoker.getUrl();
+        //执行的方法名称
         String methodName = invocation.getMethodName();
+        //获取配置的并发参数配置
         int max = invoker.getUrl().getMethodParameter(methodName, ACTIVES_KEY, 0);
         final RpcStatus rpcStatus = RpcStatus.getStatus(invoker.getUrl(), invocation.getMethodName());
+        //开始计数
         if (!RpcStatus.beginCount(url, methodName, max)) {
+            //计数失败，获取超时时间
             long timeout = invoker.getUrl().getMethodParameter(invocation.getMethodName(), TIMEOUT_KEY, 0);
+            //记录开始时间
             long start = System.currentTimeMillis();
             long remain = timeout;
             synchronized (rpcStatus) {
+                //再次尝试计数
                 while (!RpcStatus.beginCount(url, methodName, max)) {
                     try {
+                        //计数失败 阻塞等待
                         rpcStatus.wait(remain);
                     } catch (InterruptedException e) {
                         // ignore
                     }
                     long elapsed = System.currentTimeMillis() - start;
                     remain = timeout - elapsed;
+                    //等待超时
                     if (remain <= 0) {
                         throw new RpcException(RpcException.LIMIT_EXCEEDED_EXCEPTION,
                                 "Waiting concurrent invoke timeout in client-side for service:  " +
@@ -78,6 +86,7 @@ public class ActiveLimitFilter implements Filter, Filter.Listener {
 
         invocation.put(ACTIVELIMIT_FILTER_START_TIME, System.currentTimeMillis());
 
+        //调用服务
         return invoker.invoke(invocation);
     }
 
@@ -112,6 +121,17 @@ public class ActiveLimitFilter implements Filter, Filter.Listener {
         return beginTime != null ? System.currentTimeMillis() - (Long) beginTime : 0;
     }
 
+    /**
+     *
+     * 唤醒阻塞等待
+     *
+     * @author liyong
+     * @date 11:55 PM 2020/11/19
+     * @param rpcStatus
+     * @param max
+     * @exception
+     * @return void
+     **/
     private void notifyFinish(final RpcStatus rpcStatus, int max) {
         if (max > 0) {
             synchronized (rpcStatus) {
