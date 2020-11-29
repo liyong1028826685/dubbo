@@ -407,7 +407,7 @@ public class DubboProtocol extends AbstractProtocol {
      * @author liyong
      * @date 16:11 2020-03-08
      * @param serviceType
- * @param url
+     * @param url
      * @exception
      * @return org.apache.dubbo.rpc.Invoker<T>
      **/
@@ -609,7 +609,7 @@ public class DubboProtocol extends AbstractProtocol {
 
         ExchangeClient client;
         try {
-            // connection should be lazy
+            //是否延迟连接 lazy="true"
             if (url.getParameter(LAZY_CONNECT_KEY, false)) {
                 client = new LazyConnectExchangeClient(url, requestHandler);
 

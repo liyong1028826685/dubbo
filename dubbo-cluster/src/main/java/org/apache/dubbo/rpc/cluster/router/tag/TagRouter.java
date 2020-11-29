@@ -84,51 +84,66 @@ public class TagRouter extends AbstractRouter implements ConfigurationListener {
         return url;
     }
 
+    /**
+     *
+     * 标签路由
+     *
+     * @author liyong
+     * @date 4:48 PM 2020/11/29
+     * @param invokers
+     * @param url
+     * @param invocation
+     * @exception
+     * @return java.util.List<org.apache.dubbo.rpc.Invoker<T>>
+     **/
     @Override
     public <T> List<Invoker<T>> route(List<Invoker<T>> invokers, URL url, Invocation invocation) throws RpcException {
         if (CollectionUtils.isEmpty(invokers)) {
             return invokers;
         }
 
-        // since the rule can be changed by config center, we should copy one to use.
+        // 这里因为配置中心可能更新配置，所有使用另外一个常量引用（类似复制）
         final TagRouterRule tagRouterRuleCopy = tagRouterRule;
+        //如果动态规则不存在或无效或没有激活，使用静态标签
         if (tagRouterRuleCopy == null || !tagRouterRuleCopy.isValid() || !tagRouterRuleCopy.isEnabled()) {
+            //处理静态标签
             return filterUsingStaticTag(invokers, url, invocation);
         }
 
         List<Invoker<T>> result = invokers;
+        //获取上下文中Attachment的标签参数，这个参数由客户端调用时候写入
         String tag = StringUtils.isEmpty(invocation.getAttachment(TAG_KEY)) ? url.getParameter(TAG_KEY) :
                 invocation.getAttachment(TAG_KEY);
 
-        // if we are requesting for a Provider with a specific tag
+        // 如果存在传递标签
         if (StringUtils.isNotEmpty(tag)) {
+            //通过传递的标签找到动态配置对应的服务地址
             List<String> addresses = tagRouterRuleCopy.getTagnameToAddresses().get(tag);
-            // filter by dynamic tag group first
+            // 通过标签分组进行过滤
             if (CollectionUtils.isNotEmpty(addresses)) {
+                //获取匹配地址的服务
                 result = filterInvoker(invokers, invoker -> addressMatches(invoker.getUrl(), addresses));
-                // if result is not null OR it's null but force=true, return result directly
+                //如果返回结果不为null 或者 返回结果为空但是配置force=true也直接返回
                 if (CollectionUtils.isNotEmpty(result) || tagRouterRuleCopy.isForce()) {
                     return result;
                 }
             } else {
-                // dynamic tag group doesn't have any item about the requested app OR it's null after filtered by
-                // dynamic tag group but force=false. check static tag
+                //检测静态标签
                 result = filterInvoker(invokers, invoker -> tag.equals(invoker.getUrl().getParameter(TAG_KEY)));
             }
-            // If there's no tagged providers that can match the current tagged request. force.tag is set by default
-            // to false, which means it will invoke any providers without a tag unless it's explicitly disallowed.
+            //如果提供者没有配置标签 默认force.tag = false 表示可以访问任意的提供者 ，除非我们显示的禁止
             if (CollectionUtils.isNotEmpty(result) || isForceUseTag(invocation)) {
                 return result;
             }
-            // FAILOVER: return all Providers without any tags.
             else {
+                //返回所有的提供者，不需要任意标签
                 List<Invoker<T>> tmp = filterInvoker(invokers, invoker -> addressNotMatches(invoker.getUrl(),
                         tagRouterRuleCopy.getAddresses()));
+                //查找提供者标签为空
                 return filterInvoker(tmp, invoker -> StringUtils.isEmpty(invoker.getUrl().getParameter(TAG_KEY)));
             }
         } else {
-            // List<String> addresses = tagRouterRule.filter(providerApp);
-            // return all addresses in dynamic tag group.
+            //返回所有的 addresses
             List<String> addresses = tagRouterRuleCopy.getAddresses();
             if (CollectionUtils.isNotEmpty(addresses)) {
                 result = filterInvoker(invokers, invoker -> addressNotMatches(invoker.getUrl(), addresses));
@@ -136,9 +151,8 @@ public class TagRouter extends AbstractRouter implements ConfigurationListener {
                 if (CollectionUtils.isEmpty(result)) {
                     return result;
                 }
-                // 2. if there are some addresses that are not in any dynamic tag group, continue to filter using the
-                // static tag group.
             }
+            //继续使用静态标签过滤
             return filterInvoker(result, invoker -> {
                 String localTag = invoker.getUrl().getParameter(TAG_KEY);
                 return StringUtils.isEmpty(localTag) || !tagRouterRuleCopy.getTagNames().contains(localTag);
@@ -162,16 +176,19 @@ public class TagRouter extends AbstractRouter implements ConfigurationListener {
      */
     private <T> List<Invoker<T>> filterUsingStaticTag(List<Invoker<T>> invokers, URL url, Invocation invocation) {
         List<Invoker<T>> result = invokers;
-        // Dynamic param
+        // 动态标签参数
         String tag = StringUtils.isEmpty(invocation.getAttachment(TAG_KEY)) ? url.getParameter(TAG_KEY) :
                 invocation.getAttachment(TAG_KEY);
-        // Tag request
+        // 消费端指定的标签
         if (!StringUtils.isEmpty(tag)) {
+            //匹配消费端指定的标签与每一个服务提供者在 XML 中或注解中配置的静态标签是否一致
             result = filterInvoker(invokers, invoker -> tag.equals(invoker.getUrl().getParameter(TAG_KEY)));
+            //如果没有匹配到结果并且force=false 查找未配置静态标签的提供者
             if (CollectionUtils.isEmpty(result) && !isForceUseTag(invocation)) {
                 result = filterInvoker(invokers, invoker -> StringUtils.isEmpty(invoker.getUrl().getParameter(TAG_KEY)));
             }
         } else {
+            //查找未配置静态标签的提供者
             result = filterInvoker(invokers, invoker -> StringUtils.isEmpty(invoker.getUrl().getParameter(TAG_KEY)));
         }
         return result;
@@ -206,9 +223,22 @@ public class TagRouter extends AbstractRouter implements ConfigurationListener {
         return addresses == null || !checkAddressMatch(addresses, url.getHost(), url.getPort());
     }
 
+    /**
+     *
+     * 检测地址是否匹配
+     *
+     * @author liyong
+     * @date 4:46 PM 2020/11/29
+     * @param addresses
+     * @param host
+     * @param port
+     * @exception
+     * @return boolean
+     **/
     private boolean checkAddressMatch(List<String> addresses, String host, int port) {
         for (String address : addresses) {
             try {
+                //匹配ip
                 if (NetUtils.matchIpExpression(address, host, port)) {
                     return true;
                 }

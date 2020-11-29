@@ -176,6 +176,7 @@ public class ConditionRouter extends AbstractRouter {
             return invokers;
         }
         try {
+            //匹配 method = queryAll => address=*:20880 表示中的 method = queryAll 部分
             if (!matchWhen(url, invocation)) {
                 return invokers;
             }
@@ -185,12 +186,15 @@ public class ConditionRouter extends AbstractRouter {
                 return result;
             }
             for (Invoker<T> invoker : invokers) {
+                //匹配 method = queryAll => address=*:20880 表示中的 address=*:20880 部分
                 if (matchThen(invoker.getUrl(), url)) {
                     result.add(invoker);
                 }
             }
             if (!result.isEmpty()) {
                 return result;
+
+                //配置force: true 表示如果通过路由规则后没有服务条件的返回一个空集合，否则路由规则无效返回过滤器的 Invoker 远程服务代理列表
             } else if (force) {
                 logger.warn("The route result is empty and force execute. consumer: " + NetUtils.getLocalHost() + ", service: " + url.getServiceKey() + ", router: " + url.getParameterAndDecoded(RULE_KEY));
                 return result;
@@ -221,33 +225,51 @@ public class ConditionRouter extends AbstractRouter {
         return CollectionUtils.isNotEmptyMap(thenCondition) && matchCondition(thenCondition, url, param, null);
     }
 
+    /**
+     *
+     * 匹配条件
+     *
+     * @author liyong
+     * @date 11:36 PM 2020/11/28
+     * @param condition
+     * @param url
+     * @param param
+     * @param invocation
+     * @exception
+     * @return boolean
+     **/
     private boolean matchCondition(Map<String, MatchPair> condition, URL url, URL param, Invocation invocation) {
         Map<String, String> sample = url.toMap();
         boolean result = false;
+        //method = queryAll => address=*:20880
         for (Map.Entry<String, MatchPair> matchPair : condition.entrySet()) {
             String key = matchPair.getKey();
             String sampleValue;
-            //get real invoked method name from invocation
+            //从invocation中获取调用的真实方法名称
             if (invocation != null && (METHOD_KEY.equals(key) || METHODS_KEY.equals(key))) {
                 sampleValue = invocation.getMethodName();
+                //判断是否配置 address
             } else if (ADDRESS_KEY.equals(key)) {
                 sampleValue = url.getAddress();
+                //判断是否配置 host
             } else if (HOST_KEY.equals(key)) {
                 sampleValue = url.getHost();
             } else {
+                //从URL转换的map中获取对应key的值
                 sampleValue = sample.get(key);
                 if (sampleValue == null) {
                     sampleValue = sample.get(key);
                 }
             }
             if (sampleValue != null) {
+                //匹配条件配置和真实调用参数值是否匹配
                 if (!matchPair.getValue().isMatch(sampleValue, param)) {
                     return false;
                 } else {
                     result = true;
                 }
             } else {
-                //not pass the condition
+                //没有匹配的条件
                 if (!matchPair.getValue().matches.isEmpty()) {
                     return false;
                 } else {
