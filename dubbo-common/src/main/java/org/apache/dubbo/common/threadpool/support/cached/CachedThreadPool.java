@@ -51,11 +51,11 @@ public class CachedThreadPool implements ThreadPool {
         int cores = url.getParameter(CORE_THREADS_KEY, DEFAULT_CORE_THREADS);
         int threads = url.getParameter(THREADS_KEY, Integer.MAX_VALUE);
         int queues = url.getParameter(QUEUES_KEY, DEFAULT_QUEUES);
-        int alive = url.getParameter(ALIVE_KEY, DEFAULT_ALIVE);
+        int alive = url.getParameter(ALIVE_KEY, DEFAULT_ALIVE);//一分钟后被回收
         return new ThreadPoolExecutor(cores, threads, alive, TimeUnit.MILLISECONDS,
-                queues == 0 ? new SynchronousQueue<Runnable>() :
-                        (queues < 0 ? new LinkedBlockingQueue<Runnable>()
-                                : new LinkedBlockingQueue<Runnable>(queues)),
+                queues == 0 ? new SynchronousQueue<Runnable>() ://同步队列
+                        (queues < 0 ? new LinkedBlockingQueue<Runnable>()//指定无界队列
+                                : new LinkedBlockingQueue<Runnable>(queues)),//指定有限队列
                 new NamedInternalThreadFactory(name, true), new AbortPolicyWithReport(name, url));
     }
 }

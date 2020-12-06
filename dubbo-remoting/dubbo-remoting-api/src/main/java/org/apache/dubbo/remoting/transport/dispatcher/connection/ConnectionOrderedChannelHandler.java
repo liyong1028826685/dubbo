@@ -43,7 +43,7 @@ import static org.apache.dubbo.remoting.Constants.DEFAULT_CONNECT_QUEUE_WARNING_
 /***
  *@className ConnectionOrderedChannelHandler
  *
- *@description 连接相关使用自定义线程池处理，其他使用spi获取的线程池处理
+ *@description 将连接断开事件放入队列，有序逐个执行，其它消息派发到线程池
  *
  *@author <a href="http://youngitman.tech">青年IT男</a>
  *

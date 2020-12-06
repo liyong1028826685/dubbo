@@ -31,7 +31,7 @@ import java.util.concurrent.ExecutorService;
 /***
  *@className DirectChannelHandler
  *
- *@description 直接执行
+ *@description 直接IO线程执行，不派发线程池处理
  *
  *@author <a href="http://youngitman.tech">青年IT男</a>
  *

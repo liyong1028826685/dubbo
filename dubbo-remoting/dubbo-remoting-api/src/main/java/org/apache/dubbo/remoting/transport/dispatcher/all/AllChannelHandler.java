@@ -49,30 +49,64 @@ public class AllChannelHandler extends WrappedChannelHandler {
         super(handler, url);
     }
 
+    /**
+     *
+     * 远程连接事件回调
+     *
+     * @author liyong
+     * @date 1:34 PM 2020/12/6
+     * @param channel
+     * @exception
+     * @return void
+     **/
     @Override
     public void connected(Channel channel) throws RemotingException {
         ExecutorService executor = getExecutorService();
         try {
+            //连接到远程事件放入线程池执行
             executor.execute(new ChannelEventRunnable(channel, handler, ChannelState.CONNECTED));
         } catch (Throwable t) {
             throw new ExecutionException("connect event", channel, getClass() + " error when process connected event .", t);
         }
     }
 
+    /**
+     *
+     * 端口远程连接
+     *
+     * @author liyong
+     * @date 1:34 PM 2020/12/6
+     * @param channel
+     * @exception
+     * @return void
+     **/
     @Override
     public void disconnected(Channel channel) throws RemotingException {
         ExecutorService executor = getExecutorService();
         try {
+            //断开连接处理事件放入线程池执行
             executor.execute(new ChannelEventRunnable(channel, handler, ChannelState.DISCONNECTED));
         } catch (Throwable t) {
             throw new ExecutionException("disconnect event", channel, getClass() + " error when process disconnected event .", t);
         }
     }
 
+    /**
+     *
+     * 接收到数据回调
+     *
+     * @author liyong
+     * @date 1:34 PM 2020/12/6
+     * @param channel
+     * @param message
+     * @exception
+     * @return void
+     **/
     @Override
     public void received(Channel channel, Object message) throws RemotingException {
         ExecutorService executor = getPreferredExecutorService(message);
         try {
+            //接收到数据放入线程池处理
             executor.execute(new ChannelEventRunnable(channel, handler, ChannelState.RECEIVED, message));
         } catch (Throwable t) {
         	if(message instanceof Request && t instanceof RejectedExecutionException){
@@ -83,10 +117,22 @@ public class AllChannelHandler extends WrappedChannelHandler {
         }
     }
 
+    /**
+     *
+     * 发生异常回调
+     *
+     * @author liyong
+     * @date 1:35 PM 2020/12/6
+     * @param channel
+     * @param exception
+     * @exception
+     * @return void
+     **/
     @Override
     public void caught(Channel channel, Throwable exception) throws RemotingException {
         ExecutorService executor = getExecutorService();
         try {
+            //发生异常放入线程池处理
             executor.execute(new ChannelEventRunnable(channel, handler, ChannelState.CAUGHT, exception));
         } catch (Throwable t) {
             throw new ExecutionException("caught event", channel, getClass() + " error when process caught event .", t);

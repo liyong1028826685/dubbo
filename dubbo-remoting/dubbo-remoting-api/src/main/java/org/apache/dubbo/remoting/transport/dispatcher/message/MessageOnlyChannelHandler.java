@@ -30,7 +30,7 @@ import java.util.concurrent.ExecutorService;
 /***
  *@className MessageOnlyChannelHandler
  *
- *@description 消息接受处理分发到线程池
+ *@description 只处理请求消息并分发到线程池
  *
  *@author <a href="http://youngitman.tech">青年IT男</a>
  *

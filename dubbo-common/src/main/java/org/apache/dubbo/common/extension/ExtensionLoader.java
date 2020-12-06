@@ -108,7 +108,9 @@ public class ExtensionLoader<T> {
     private Map<String, IllegalStateException> exceptions = new ConcurrentHashMap<>();
 
     private ExtensionLoader(Class<?> type) {
+        //加载的拓展类类型
         this.type = type;
+        //容器工厂，如果不是加载ExtensionFactory对象先执行ExtensionFactory加载再执行getAdaptiveExtension
         objectFactory = (type == ExtensionFactory.class ? null : ExtensionLoader.getExtensionLoader(ExtensionFactory.class).getAdaptiveExtension());
     }
 
@@ -534,6 +536,7 @@ public class ExtensionLoader<T> {
 
     @SuppressWarnings("unchecked")
     public T getAdaptiveExtension() {
+        //缓存获取
         Object instance = cachedAdaptiveInstance.get();
         if (instance == null) {
             if (createAdaptiveInstanceError != null) {
@@ -542,11 +545,15 @@ public class ExtensionLoader<T> {
                         createAdaptiveInstanceError);
             }
 
+            //加锁判断
             synchronized (cachedAdaptiveInstance) {
+                //再次获取 双重锁检测
                 instance = cachedAdaptiveInstance.get();
                 if (instance == null) {
                     try {
+                        //创建拓展实例
                         instance = createAdaptiveExtension();
+                        //进行缓存
                         cachedAdaptiveInstance.set(instance);
                     } catch (Throwable t) {
                         createAdaptiveInstanceError = t;
@@ -736,7 +743,9 @@ public class ExtensionLoader<T> {
             synchronized (cachedClasses) {
                 classes = cachedClasses.get();
                 if (classes == null) {
+                    //开始从资源路径加载Class
                     classes = loadExtensionClasses();
+                    //设置缓存
                     cachedClasses.set(classes);
                 }
             }
@@ -823,6 +832,7 @@ public class ExtensionLoader<T> {
             if (urls != null) {
                 while (urls.hasMoreElements()) {
                     java.net.URL resourceURL = urls.nextElement();
+                    //加载资源
                     loadResource(extensionClasses, classLoader, resourceURL);
                 }
             }
@@ -836,6 +846,7 @@ public class ExtensionLoader<T> {
         try {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(resourceURL.openStream(), StandardCharsets.UTF_8))) {
                 String line;
+                //读取一行数据
                 while ((line = reader.readLine()) != null) {
                     final int ci = line.indexOf('#');//去掉注释
                     if (ci >= 0) {
@@ -851,6 +862,7 @@ public class ExtensionLoader<T> {
                                 line = line.substring(i + 1).trim();
                             }
                             if (line.length() > 0) {
+                                //加载Class
                                 loadClass(extensionClasses, resourceURL, Class.forName(line, true, classLoader), name);
                             }
                         } catch (Throwable t) {
@@ -997,6 +1009,7 @@ public class ExtensionLoader<T> {
     @SuppressWarnings("unchecked")
     private T createAdaptiveExtension() {
         try {
+            //首先创建拓展实例，然后注入依赖
             return injectExtension((T) getAdaptiveExtensionClass().newInstance());
         } catch (Exception e) {
             throw new IllegalStateException("Can't create adaptive extension " + type + ", cause: " + e.getMessage(), e);
@@ -1004,10 +1017,12 @@ public class ExtensionLoader<T> {
     }
 
     private Class<?> getAdaptiveExtensionClass() {
+        //获取拓展类
         getExtensionClasses();
         if (cachedAdaptiveClass != null) {
             return cachedAdaptiveClass;
         }
+        //动态生成Class
         return cachedAdaptiveClass = createAdaptiveExtensionClass();
     }
 
