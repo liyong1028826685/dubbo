@@ -108,18 +108,25 @@ public @interface Service {
 
     String[] parameters() default {};
 
+    /** 指定自定义的ApplicationConfig的bean名称 */
     String application() default "";
 
+    /** 指定自定义的ModuleConfig的bean名称 */
     String module() default "";
 
+    /** 指定自定义的提供者(ProviderConfig)bean名称 */
     String provider() default "";
 
+    /** 自定自定义的ProtocolConfig的bean名称 */
     String[] protocol() default {};
 
+    /** 指定自定义的monitor(MonitorConfig)的bean名称 */
     String monitor() default "";
 
+    /** 指定自定义的注册中心(RegistryConfig)bean名称 */
     String[] registry() default {};
 
+    /** 指定自定义的tag */
     String tag() default "";
 
     Method[] methods() default {};

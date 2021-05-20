@@ -189,6 +189,7 @@ public class AnnotationBean extends AbstractConfig implements DisposableBean, Be
                     serviceConfig.setTag(service.tag());
                 }
                 try {
+                    //初始化回调
                     serviceConfig.afterPropertiesSet();
                 } catch (RuntimeException e) {
                     throw e;
@@ -197,6 +198,7 @@ public class AnnotationBean extends AbstractConfig implements DisposableBean, Be
                 }
             }
             serviceConfigs.add(serviceConfig);
+            //开始服务导出
             serviceConfig.export();
         }
         return bean;
