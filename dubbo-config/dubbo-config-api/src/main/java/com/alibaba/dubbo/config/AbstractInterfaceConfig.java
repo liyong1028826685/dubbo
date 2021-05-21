@@ -147,6 +147,7 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
         }
         appendProperties(application);
 
+        //设置SHUTDOWN等待时间
         String wait = ConfigUtils.getProperty(Constants.SHUTDOWN_WAIT_KEY);
         if (wait != null && wait.trim().length() > 0) {
             System.setProperty(Constants.SHUTDOWN_WAIT_KEY, wait.trim());
@@ -288,6 +289,16 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
         }
     }
 
+    /**
+     *
+     * mock实现检查
+     *
+     * @author liyong
+     * @date 11:20 PM 2021/5/20
+     * @param interfaceClass
+     * @exception
+     * @return void
+     **/
     void checkMock(Class<?> interfaceClass) {
         if (ConfigUtils.isEmpty(mock)) {
             return;
@@ -317,6 +328,16 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
         }
     }
 
+    /**
+     *
+     * 存根方法检测
+     *
+     * @author liyong
+     * @date 11:19 PM 2021/5/20
+     * @param interfaceClass
+     * @exception
+     * @return void
+     **/
     void checkStub(Class<?> interfaceClass) {
         if (ConfigUtils.isNotEmpty(local)) {
             Class<?> localClass = ConfigUtils.isDefault(local) ? ReflectUtils.forName(interfaceClass.getName() + "Local") : ReflectUtils.forName(local);

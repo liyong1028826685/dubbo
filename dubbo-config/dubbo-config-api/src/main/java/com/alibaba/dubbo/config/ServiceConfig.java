@@ -279,6 +279,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
             checkRef();
             generic = Boolean.FALSE.toString();
         }
+        //本地实现，类命名规则：接口+Local 且实现接口
         if (local != null) {
             if ("true".equals(local)) {
                 local = interfaceName + "Local";
@@ -293,6 +294,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
                 throw new IllegalStateException("The local implementation class " + localClass.getName() + " not implement interface " + interfaceName);
             }
         }
+        //本地实现的存根，命名规则：接口+Stub 且实现接口
         if (stub != null) {
             if ("true".equals(stub)) {
                 stub = interfaceName + "Stub";
